@@ -21,20 +21,13 @@ export default defineConfig({
 		// },
 
 	},
-	// preview: {
-	// },
-	
 	build: {
-		// outDir: 'build',
-
+		// outDir: 'dist',
 		rollupOptions: {
 			external: [
-				// '@org/pkg'
-
+				// structure: how import path looks
 				'gsap',
 				'gsap/ScrollTrigger',
-
-				// ...Object.keys(pkg.devDependencies),
 			]
 		},
 	},
@@ -66,4 +59,4 @@ export default defineConfig({
 			},
 		  },
 	  ]
-})
+});
