@@ -1,4 +1,4 @@
-// 
+//
 
 function skeeter() {
   console.log('skeet');
@@ -6,16 +6,38 @@ function skeeter() {
 
 (window as any).skeeter = skeeter;
 
-// http://localhost:5173/src/main
+import gsap from 'gsap'
+import ScrollTrigger from "gsap/ScrollTrigger"; // nice! modular
 
-export function actuallyjs() {
-  console.log('actuallyjs');
+gsap.registerPlugin(ScrollTrigger);
 
-  let words:string = '';
-  words = '123';
-  // words = 123;
-  console.log('words', words);
+window.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM loaded');
 
-  // const food = 'oranges';
 
-}
+  // gsap.to('.') // woo, gsap autocomplete
+
+
+
+  // jquery way...
+  // ($ as any)('.trigger-areas').each((index: ) => {
+
+  // })
+
+
+
+  let tEls = document.querySelectorAll('.trigger-area');
+  for (let tEl of tEls) {
+    console.log('create tirgger', tEl);
+
+    ScrollTrigger.create({
+      trigger: tEl,
+      start: 'top center',
+      end: 'bottom center',
+      markers: true,
+    });
+
+  }
+
+  
+}, false);

@@ -1,6 +1,8 @@
 import { defineConfig } from "vite";
 import mkcert from 'vite-plugin-mkcert';
 
+import * as pkg from './package.json';
+
 export default defineConfig({
 	server: {
 		// host: true,
@@ -19,12 +21,20 @@ export default defineConfig({
 		// },
 
 	},
+	// preview: {
+	// },
+	
 	build: {
 		// outDir: 'build',
 
 		rollupOptions: {
 			external: [
 				// '@org/pkg'
+
+				'gsap',
+				'gsap/ScrollTrigger',
+
+				// ...Object.keys(pkg.devDependencies),
 			]
 		},
 	},
@@ -35,6 +45,16 @@ export default defineConfig({
 		{
 			name: 'vite-server-set-headers',
 			configureServer(server) {
+				// Add middleware to allow private network access
+				server.middlewares.use((req, res, next) => {
+					if ((req as any).method === 'OPTIONS') {
+						// needed to work in browser cross domain (like in webflow)
+						res.setHeader('Access-Control-Allow-Private-Network', 'true');
+					}
+					next();
+				});
+			},
+			configurePreviewServer(server) {
 				// Add middleware to allow private network access
 				server.middlewares.use((req, res, next) => {
 					if ((req as any).method === 'OPTIONS') {
