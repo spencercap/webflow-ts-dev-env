@@ -26,7 +26,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
   let titleInnerEl = document.querySelector<HTMLElement>(`.title-wrap-inner`);
-  let tEls = document.querySelectorAll(`.section-gradient`);
+  let tEls = document.querySelectorAll(`.grid-project-d`);
+  let offsetAmtY = titleInnerEl!.getBoundingClientRect().height / tEls.length;
 
   for (let [i, tEl] of tEls.entries()) {
     // console.log('create tirgger', tEl);
@@ -44,7 +45,8 @@ window.addEventListener('DOMContentLoaded', () => {
         
         if (e.isActive) {
           console.log(i);
-          titleInnerEl!.style.transform = `translateY(${i * -69}px)`;
+          // titleInnerEl!.style.transform = `translateY(${i * -69}px)`;
+          titleInnerEl!.style.transform = `translateY(${i * -offsetAmtY}px)`;
         } else {
           //
         }
