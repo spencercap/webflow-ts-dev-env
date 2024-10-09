@@ -57,12 +57,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
   // init hidden
+  // @ts-expect-error
   $('.heading-project').addClass('hidden-down');
 
 
   let workEls = document.querySelectorAll(`.work-wrap-lightbox`);
   
-
+  // @ts-expect-error
   for (let [i, workEl] of workEls.entries()) {
     // console.log('create tirgger', tEl);
 
