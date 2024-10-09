@@ -25,26 +25,28 @@ window.addEventListener('DOMContentLoaded', () => {
   // })
 
 
+  let titleInnerEl = document.querySelector<HTMLElement>(`.title-wrap-inner`);
+  let tEls = document.querySelectorAll(`.section-gradient`);
 
-  let tEls = document.querySelectorAll('.trigger-area');
-  for (let tEl of tEls) {
-    console.log('create tirgger', tEl);
-
-    // `.title-wrap-inner` 
-    // `.section-gradient`
+  for (let [i, tEl] of tEls.entries()) {
+    // console.log('create tirgger', tEl);
 
     ScrollTrigger.create({
       trigger: tEl,
-      start: 'top center',
-      end: 'bottom center',
+      // start: 'top center',
+      // end: 'bottom center',
+      // Start 10% into the element
+      start: 'top+=10% center', 
+      end: 'bottom-=10% center', 
       markers: true,
       onToggle: (e) => {
-        console.log('onToggle', e, tEl);
+        // console.log('onToggle', e, tEl);
         
         if (e.isActive) {
-          
+          console.log(i);
+          titleInnerEl!.style.transform = `translateY(${i * -69}px)`;
         } else {
-
+          //
         }
 
       },
