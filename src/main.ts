@@ -30,11 +30,24 @@ window.addEventListener('DOMContentLoaded', () => {
   for (let tEl of tEls) {
     console.log('create tirgger', tEl);
 
+    // `.title-wrap-inner` 
+    // `.section-gradient`
+
     ScrollTrigger.create({
       trigger: tEl,
       start: 'top center',
       end: 'bottom center',
       markers: true,
+      onToggle: (e) => {
+        console.log('onToggle', e, tEl);
+        
+        if (e.isActive) {
+          
+        } else {
+
+        }
+
+      },
     });
 
   }
