@@ -26,7 +26,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
   let titleInnerEl = document.querySelector<HTMLElement>(`.title-wrap-inner`);
-  let tEls = document.querySelectorAll(`.grid-project-d`);
+  let tEls = document.querySelectorAll(`.works-cluster`);
   let offsetAmtY = titleInnerEl!.getBoundingClientRect().height / tEls.length;
 
   for (let [i, tEl] of tEls.entries()) {
@@ -39,12 +39,12 @@ window.addEventListener('DOMContentLoaded', () => {
       // Start 10% into the element
       start: 'top+=10% center', 
       end: 'bottom-=10% center', 
-      markers: true,
+      // markers: true,
       onToggle: (e) => {
         // console.log('onToggle', e, tEl);
         
         if (e.isActive) {
-          console.log(i);
+          // console.log('workAreaActive', i);
           // titleInnerEl!.style.transform = `translateY(${i * -69}px)`;
           titleInnerEl!.style.transform = `translateY(${i * -offsetAmtY}px)`;
         } else {
@@ -53,8 +53,56 @@ window.addEventListener('DOMContentLoaded', () => {
 
       },
     });
+  } // end for loop
 
-  }
 
+  // init hidden
+  $('.heading-project').addClass('hidden-down');
+
+
+  let workEls = document.querySelectorAll(`.work-wrap-lightbox`);
+  
+
+  for (let [i, workEl] of workEls.entries()) {
+    // console.log('create tirgger', tEl);
+
+    ScrollTrigger.create({
+      trigger: workEl,
+
+      start: 'top-=30px center', 
+      end: 'bottom+=60px center', 
+
+      // start: 'top center', 
+      // end: 'bottom center', 
+      markers: true,
+      // onToggle: (e) => {
+      //   // console.log('onToggle', e, tEl);
+
+      //   let headEl = workEl.querySelector<HTMLElement>('.heading-project');
+        
+      //   if (e.isActive) {
+      //     console.log('workActive', i);
+      //     headEl?.classList.remove('hidden');
+      //   } else {
+      //     headEl?.classList.add('hidden');
+      //   }
+
+      // },
+
+      onEnter: () => {
+        workEl.querySelector('.heading-project')?.classList.remove('hidden-down');
+      },
+      onLeave: () => {
+        workEl.querySelector('.heading-project')?.classList.add('hidden-up');
+      },
+      onEnterBack: () => {
+        workEl.querySelector('.heading-project')?.classList.remove('hidden-up');
+      },
+      onLeaveBack: () => {
+        workEl.querySelector('.heading-project')?.classList.add('hidden-down');
+      }
+
+    });
+  } // end for loop
   
 }, false);
