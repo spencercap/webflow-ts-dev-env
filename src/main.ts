@@ -72,10 +72,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
       start: 'top-=30px center', 
       end: 'bottom+=60px center', 
-
       // start: 'top center', 
       // end: 'bottom center', 
-      markers: true,
+      
+      // markers: true,
+
       // onToggle: (e) => {
       //   // console.log('onToggle', e, tEl);
 
