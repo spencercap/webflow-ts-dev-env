@@ -1,5 +1,3 @@
-//
-
 // function skeeter() {
 // 	console.log('skeet');
 // }
@@ -7,14 +5,15 @@
 // (window as any).skeeter = skeeter;
 
 
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/controls/OrbitControls.js';
-import { EffectComposer } from 'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/postprocessing/RenderPass.js';
-import { ShaderPass } from 'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/postprocessing/ShaderPass.js';
-import { UnrealBloomPass } from 'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { SVGLoader } from 'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/loaders/SVGLoader.js';
-import { GUI } from 'https://cdn.jsdelivr.net/npm/dat.gui/build/dat.gui.module.js';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
+import { GUI } from 'dat.gui';
+
 
 const params = {
 	a: 3,
@@ -34,7 +33,8 @@ const params = {
 	bloomThreshold: 0,
 	exposure: 1,
 	backgroundColor: 0x000000,
-	// hoer yellow/green #c3ff03
+	grainAmount: 0.08,
+	grainSpeed: 1.0,
 };
 
 // Initialize the scene, camera, and renderer
@@ -133,20 +133,26 @@ scene.add(directionalLight);
 
 // OrbitControls for interaction
 const controls = new OrbitControls(camera, renderer.domElement);
+controls;
 
 // Set the initial background color of the scene
 scene.background = new THREE.Color(params.backgroundColor);
 
 // Variable to store the mesh
-let tubeMesh;
+let tubeMesh: THREE.Mesh<THREE.TubeGeometry>;
+// let tubeMesh: THREE.Mesh<any>;
 
 // Function to create/update the Lissajous curve
 function createLissajousCurve() {
 	if (tubeMesh) {
 		scene.remove(tubeMesh);
 		tubeMesh.geometry.dispose();
-		tubeMesh.material.dispose();
-		tubeMesh = undefined;
+		if (Array.isArray(tubeMesh.material)) {
+			tubeMesh.material.forEach(m => m.dispose());
+		} else {
+			tubeMesh.material.dispose();
+		}
+		tubeMesh = undefined as any; // reset
 	}
 
 	const points = [];
@@ -330,16 +336,20 @@ gui.add(params, 'bloomThreshold', 0.0, 1.0).onChange(function (value) {
 
 gui.add(params, 'exposure', 0.1, 2).onChange(function (value) {
 	renderer.toneMappingExposure = value;
-	// Update composer's exposure as well
-	composer.passes.forEach(pass => {
-		if (pass instanceof RenderPass) {
-			pass.toneMappingExposure = value;
-		}
-	});
+
+	// prev
+	// renderer.toneMappingExposure = value;
+	// // Update composer's exposure as well
+	// composer.passes.forEach(pass => {
+	// 	if (pass instanceof RenderPass) {
+	// 		pass.toneMappingExposure = value;
+	// 	}
+	// });
 }).name('Exposure');
 
 gui.addColor(params, 'backgroundColor').onChange(function (value) {
-	scene.background.set(value);
+	// rough typing...
+	(scene as any).background.set(value);
 }).name('BG Color');
 
 // Add grain controls to GUI
