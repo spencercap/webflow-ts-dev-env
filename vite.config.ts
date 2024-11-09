@@ -26,8 +26,8 @@ export default defineConfig({
 		rollupOptions: {
 			external: [
 				// structure: how import path looks
-				'gsap',
-				'gsap/ScrollTrigger',
+				'three',
+				'dat.gui'
 			]
 		},
 	},
