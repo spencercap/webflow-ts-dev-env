@@ -16,32 +16,49 @@ import { GUI } from 'dat.gui';
 
 
 const tubeRadiusRange = {
-    min: 0.06,
+    min: 0.01,
     max: 0.15,
     speed: 	0.5 // Controls oscillation speed
 };
 
+const colorRange = {
+    speed: 0.01, // Controls color change speed
+};
+
+const bloomStrengthRange = {
+    min: 1.1,
+    max: 2.5,
+    speed: 0.3  // Controls oscillation speed
+};
+
+const cameraZoomRange = {
+    min: 12,
+    max: 41,
+    speed: -0.2  // Controls oscillation speed
+};
+
 const params = {
-	a: 3,
-	b: 2,
+	a: Math.floor(Math.random() * 10) + 1, // random btwn 10
+	b: Math.floor(Math.random() * 10) + 1, // random btwn 10,
 	c: 1,
 	delta: Math.PI / 2,
-	A: 5,
-	B: 5,
-	C: 5,
+	A: 16,
+	B: 17,
+	C: 10,
 	tubeRadius: 0.2,
 	radialSegments: 8,
 	// color: 0xff0000,
 	color: 0xc3ff03,
-	pixelSize: 10, // Pixel size for shader
+	pixelSize: 40, // Pixel size for shader
 	bloomStrength: 1.5,
 	bloomRadius: 0.4,
 	bloomThreshold: 0,
 	exposure: 1,
 	backgroundColor: 0x000000,
-	grainAmount: 0.4,
-	grainSpeed: 0.4,
+	grainAmount: 0.3,
+	grainSpeed: 0.2,
 	animateValues: true, // New parameter for animation toggle
+	cameraDistance: 15, // Initial camera distance
 };
 
 // Initialize the scene, camera, and renderer
@@ -52,6 +69,8 @@ const camera = new THREE.PerspectiveCamera(
 	0.1,
 	1000
 );
+// Set camera position
+camera.position.z = params.cameraDistance;
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = params.exposure;
@@ -127,7 +146,7 @@ svgGroup.position.sub(center);
 // Scale and position the SVG
 svgGroup.scale.set(0.05, -0.05, 0.05); // Adjust scale as needed
 svgGroup.position.set(-9, 3, 0); // Center position
-scene.add(svgGroup);
+// scene.add(svgGroup);
 
 
 // Add lighting
@@ -192,9 +211,6 @@ function updateLissajousCurve() {
     );
     material.color.setHex(params.color);
 }
-
-// Set camera position
-camera.position.z = 15;
 
 // Create the pixelation shader
 const PixelationShader = {
@@ -286,7 +302,8 @@ void main() {
 // Create and add the grain pass after your existing passes
 const grainPass = new ShaderPass(GrainShader);
 composer.addPass(grainPass);
-
+grainPass.uniforms.amount.value = params.grainAmount;
+grainPass.uniforms.speed.value = params.grainSpeed;
 
 
 // --- GUI ---
@@ -308,15 +325,10 @@ parentElement!.appendChild(gui.domElement);
 gui.add(params, 'a', 1, 10, 1).onChange(updateLissajousCurve);
 gui.add(params, 'b', 1, 10, 1).onChange(updateLissajousCurve);
 gui.add(params, 'c', 1, 10, 1).onChange(updateLissajousCurve);
-gui.add(params, 'A', 1, 10).onChange(updateLissajousCurve);
-gui.add(params, 'B', 1, 10).onChange(updateLissajousCurve);
-gui.add(params, 'C', 1, 10).onChange(updateLissajousCurve);
-const tubeRadiusController = gui.add(params, 'tubeRadius', 0.05, 0.4).step(0.005).onChange(updateLissajousCurve);
-
-// Create a function to update the GUI controller
-function updateTubeRadiusGUI() {
-	tubeRadiusController.setValue(params.tubeRadius);
-}
+gui.add(params, 'A', 1, 20).onChange(updateLissajousCurve);
+gui.add(params, 'B', 1, 20).onChange(updateLissajousCurve);
+gui.add(params, 'C', 1, 20).onChange(updateLissajousCurve);
+const tubeRadiusController = gui.add(params, 'tubeRadius', 0.01, 0.8).step(0.005).onChange(updateLissajousCurve);
 
 gui.add(params, 'radialSegments', 3, 20, 1).onChange(updateLissajousCurve);
 gui.addColor(params, 'color').onChange(updateLissajousCurve);
@@ -353,7 +365,6 @@ gui.addColor(params, 'backgroundColor').onChange(function (value) {
 	(scene as any).background.set(value);
 }).name('BG Color');
 
-// Add grain controls to GUI
 gui.add(params, 'grainAmount', 0, 0.5).onChange(function (value) {
 	grainPass.uniforms.amount.value = value;
 }).name('Grain Amount');
@@ -363,7 +374,56 @@ gui.add(params, 'grainSpeed', 0, 5).onChange(function (value) {
 }).name('Grain Speed');
 
 // Add to your GUI setup
+gui.add(params, 'cameraDistance', 5, 50).onChange((value) => {
+	camera.position.z = value;
+}).name('Camera Zoom');
+
 gui.add(params, 'animateValues').name('Animate Values?');
+
+// gui helpers
+
+// Create a function to update the GUI controller
+function updateTubeRadiusGUI() {
+	tubeRadiusController.setValue(params.tubeRadius);
+}
+
+
+// Add this helper function to update the color GUI
+function updateColorGUI() {
+	// Find and update the color controller
+	if (gui) {
+		const colorController = Object.values(gui.__controllers).find(
+			controller => controller.property === 'color'
+		);
+		if (colorController) {
+			colorController.updateDisplay();
+		}
+	}	
+}
+
+// Add helper function to update bloom strength GUI
+function updateBloomStrengthGUI() {
+    if (gui) {
+        const bloomController = Object.values(gui.__controllers).find(
+            controller => controller.property === 'bloomStrength'
+        );
+        if (bloomController) {
+            bloomController.updateDisplay();
+        }
+    }
+}
+
+function updateCameraZoomGUI() {
+    if (gui) {
+        const zoomController = Object.values(gui.__controllers).find(
+            controller => controller.property === 'cameraDistance'
+        );
+        if (zoomController) {
+            zoomController.updateDisplay();
+        }
+    }
+}
+
 
 // Handle window resize
 window.addEventListener('resize', () => {
@@ -386,6 +446,10 @@ if (!window.location.search.includes('dev')) {
 window.addEventListener('DOMContentLoaded', () => {
 	console.log('DOM loaded');
 
+	// init pixel size based on screen width (mobile, they are chunkier)
+	let pxVal = Math.min(42, Math.floor(window.innerWidth / 22));
+	params.pixelSize = pxVal;
+	pixelPass.uniforms['pixelSize'].value = pxVal;
 
 }, false);
 
@@ -400,7 +464,28 @@ function animate() {
 	if (params.animateValues) {  // Only animate if enabled
 		params.tubeRadius = tubeRadiusRange.min + (Math.sin(time * tubeRadiusRange.speed) + 1) * 0.5 * (tubeRadiusRange.max - tubeRadiusRange.min);
 		updateTubeRadiusGUI();
+
+		// Create a cycling hue value
+		const hue = (time * colorRange.speed) % 1;
+		// Convert HSL to RGB (using helper function)
+		const color = new THREE.Color();
+		color.setHSL(hue, 1, 0.5);
+		// Convert to hex and update params
+		params.color = color.getHex();
+		// Update the GUI color control
+		updateColorGUI();
+
+		// Add bloom strength animation
+        params.bloomStrength = bloomStrengthRange.min + (Math.sin(time * bloomStrengthRange.speed) + 1) * 0.5 * (bloomStrengthRange.max - bloomStrengthRange.min);
+        bloomPass.strength = params.bloomStrength;
+        updateBloomStrengthGUI();
+
+		 // Add camera zoom animation
+		 params.cameraDistance = cameraZoomRange.min + (Math.sin((time + 4) * cameraZoomRange.speed) + 1) * 0.5 * (cameraZoomRange.max - cameraZoomRange.min);
+		 camera.position.z = params.cameraDistance;
+		 updateCameraZoomGUI();
 	}
+
 	updateLissajousCurve();
 
 	tubeMesh.rotation.x += 0.005;
