@@ -17,8 +17,8 @@ import { GUI } from 'dat.gui';
 
 const tubeRadiusRange = {
     min: 0.06,
-    max: 0.2,
-    speed: 	1 // Controls oscillation speed
+    max: 0.15,
+    speed: 	0.5 // Controls oscillation speed
 };
 
 const params = {
@@ -41,6 +41,7 @@ const params = {
 	backgroundColor: 0x000000,
 	grainAmount: 0.4,
 	grainSpeed: 0.4,
+	animateValues: true, // New parameter for animation toggle
 };
 
 // Initialize the scene, camera, and renderer
@@ -282,13 +283,112 @@ void main() {
 `
 };
 
-// Add grain parameters to your existing params object
-params.grainAmount = 0.08;
-params.grainSpeed = 1.0;
-
 // Create and add the grain pass after your existing passes
 const grainPass = new ShaderPass(GrainShader);
 composer.addPass(grainPass);
+
+
+
+// --- GUI ---
+
+// GUI for interactive parameters
+const parentElement = document.querySelector('.bodyreal'); // Your parent element
+// console.log('parentElement', parentElement);
+let gui: GUI | undefined;
+gui = new GUI();
+// console.log('gui', gui);
+const guiElement = gui.domElement;
+guiElement.style.zIndex = '9999';
+guiElement.style.position = 'fixed';
+guiElement.style.top = '50px';
+guiElement.style.right = '0px';
+parentElement!.appendChild(gui.domElement);
+
+// Add all your existing GUI controls
+gui.add(params, 'a', 1, 10, 1).onChange(updateLissajousCurve);
+gui.add(params, 'b', 1, 10, 1).onChange(updateLissajousCurve);
+gui.add(params, 'c', 1, 10, 1).onChange(updateLissajousCurve);
+gui.add(params, 'A', 1, 10).onChange(updateLissajousCurve);
+gui.add(params, 'B', 1, 10).onChange(updateLissajousCurve);
+gui.add(params, 'C', 1, 10).onChange(updateLissajousCurve);
+const tubeRadiusController = gui.add(params, 'tubeRadius', 0.05, 0.4).step(0.005).onChange(updateLissajousCurve);
+
+// Create a function to update the GUI controller
+function updateTubeRadiusGUI() {
+	tubeRadiusController.setValue(params.tubeRadius);
+}
+
+gui.add(params, 'radialSegments', 3, 20, 1).onChange(updateLissajousCurve);
+gui.addColor(params, 'color').onChange(updateLissajousCurve);
+gui.add(params, 'pixelSize', 1, 50).onChange(function (value) {
+	pixelPass.uniforms['pixelSize'].value = value;
+}).name('Pixel Size');
+
+// Add bloom controls
+gui.add(params, 'bloomStrength', 0.0, 3.0).onChange(function (value) {
+	bloomPass.strength = value;
+}).name('Bloom Strength');
+gui.add(params, 'bloomRadius', 0.0, 1.0).onChange(function (value) {
+	bloomPass.radius = value;
+}).name('Bloom Radius');
+gui.add(params, 'bloomThreshold', 0.0, 1.0).onChange(function (value) {
+	bloomPass.threshold = value;
+}).name('Bloom Threshold');
+
+gui.add(params, 'exposure', 0.1, 2).onChange(function (value) {
+	renderer.toneMappingExposure = value;
+
+	// prev
+	// renderer.toneMappingExposure = value;
+	// // Update composer's exposure as well
+	// composer.passes.forEach(pass => {
+	//     if (pass instanceof RenderPass) {
+	//         pass.toneMappingExposure = value;
+	//     }
+	// });
+}).name('Exposure');
+
+gui.addColor(params, 'backgroundColor').onChange(function (value) {
+	// rough typing...
+	(scene as any).background.set(value);
+}).name('BG Color');
+
+// Add grain controls to GUI
+gui.add(params, 'grainAmount', 0, 0.5).onChange(function (value) {
+	grainPass.uniforms.amount.value = value;
+}).name('Grain Amount');
+
+gui.add(params, 'grainSpeed', 0, 5).onChange(function (value) {
+	grainPass.uniforms.speed.value = value;
+}).name('Grain Speed');
+
+// Add to your GUI setup
+gui.add(params, 'animateValues').name('Animate Values?');
+
+// Handle window resize
+window.addEventListener('resize', () => {
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+	pixelPass.uniforms['resolution'].value.set(
+		window.innerWidth,
+		window.innerHeight
+	);
+	bloomPass.setSize(window.innerWidth, window.innerHeight);
+	composer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// only show w dev param is present
+if (!window.location.search.includes('dev')) {
+    guiElement.style.display = 'none';
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+	console.log('DOM loaded');
+
+
+}, false);
+
 
 // Update the animation loop to include time for the grain effect
 let time = 0;
@@ -297,8 +397,10 @@ function animate() {
 	time += 0.01;
 	grainPass.uniforms.time.value = time;
 
-	params.tubeRadius = tubeRadiusRange.min + (Math.sin(time * tubeRadiusRange.speed) + 1) * 0.5 * (tubeRadiusRange.max - tubeRadiusRange.min);
-	console.log('params.tubeRadius', params.tubeRadius);
+	if (params.animateValues) {  // Only animate if enabled
+		params.tubeRadius = tubeRadiusRange.min + (Math.sin(time * tubeRadiusRange.speed) + 1) * 0.5 * (tubeRadiusRange.max - tubeRadiusRange.min);
+		updateTubeRadiusGUI();
+	}
 	updateLissajousCurve();
 
 	tubeMesh.rotation.x += 0.005;
@@ -310,90 +412,3 @@ function animate() {
 
 // Animation loop
 animate();
-
-
-// GUI for interactive parameters
-const parentElement = document.querySelector('.bodyreal'); // Your parent element
-// console.log('parentElement', parentElement);
-let gui: GUI | undefined;
-if (window.location.search.includes('dev')) {
-    gui = new GUI();
-    const guiElement = gui.domElement;
-    guiElement.style.zIndex = '9999';
-    guiElement.style.position = 'fixed';
-    guiElement.style.top = '50px';
-    guiElement.style.right = '0px';
-    parentElement!.appendChild(gui.domElement);
-
-    // Add all your existing GUI controls
-    gui.add(params, 'a', 1, 10, 1).onChange(updateLissajousCurve);
-    gui.add(params, 'b', 1, 10, 1).onChange(updateLissajousCurve);
-    gui.add(params, 'c', 1, 10, 1).onChange(updateLissajousCurve);
-    gui.add(params, 'A', 1, 10).onChange(updateLissajousCurve);
-    gui.add(params, 'B', 1, 10).onChange(updateLissajousCurve);
-    gui.add(params, 'C', 1, 10).onChange(updateLissajousCurve);
-    gui.add(params, 'tubeRadius', 0.05, 1).step(0.01).onChange(updateLissajousCurve);
-    gui.add(params, 'radialSegments', 3, 20, 1).onChange(updateLissajousCurve);
-    gui.addColor(params, 'color').onChange(updateLissajousCurve);
-    gui.add(params, 'pixelSize', 1, 50).onChange(function (value) {
-        pixelPass.uniforms['pixelSize'].value = value;
-    }).name('Pixel Size');
-
-    // Add bloom controls
-    gui.add(params, 'bloomStrength', 0.0, 3.0).onChange(function (value) {
-        bloomPass.strength = value;
-    }).name('Bloom Strength');
-    gui.add(params, 'bloomRadius', 0.0, 1.0).onChange(function (value) {
-        bloomPass.radius = value;
-    }).name('Bloom Radius');
-    gui.add(params, 'bloomThreshold', 0.0, 1.0).onChange(function (value) {
-        bloomPass.threshold = value;
-    }).name('Bloom Threshold');
-
-    gui.add(params, 'exposure', 0.1, 2).onChange(function (value) {
-        renderer.toneMappingExposure = value;
-
-        // prev
-        // renderer.toneMappingExposure = value;
-        // // Update composer's exposure as well
-        // composer.passes.forEach(pass => {
-        //     if (pass instanceof RenderPass) {
-        //         pass.toneMappingExposure = value;
-        //     }
-        // });
-    }).name('Exposure');
-
-    gui.addColor(params, 'backgroundColor').onChange(function (value) {
-        // rough typing...
-        (scene as any).background.set(value);
-    }).name('BG Color');
-
-    // Add grain controls to GUI
-    gui.add(params, 'grainAmount', 0, 0.5).onChange(function (value) {
-        grainPass.uniforms.amount.value = value;
-    }).name('Grain Amount');
-
-    gui.add(params, 'grainSpeed', 0, 5).onChange(function (value) {
-        grainPass.uniforms.speed.value = value;
-    }).name('Grain Speed');
-
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        pixelPass.uniforms['resolution'].value.set(
-            window.innerWidth,
-            window.innerHeight
-        );
-        bloomPass.setSize(window.innerWidth, window.innerHeight);
-        composer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-	console.log('DOM loaded');
-
-
-}, false);
