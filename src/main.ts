@@ -131,6 +131,16 @@ window.addEventListener('DOMContentLoaded', () => {
           (sEl as any).swiper.autoplay.resume();
         } else {
           (sEl as any).swiper.autoplay.pause();
+
+          // pause videos off-screen 
+          const videos = sEl.querySelectorAll<HTMLVideoElement>('.swiper-slide video');
+          console.log('videos', videos);
+    
+          // Loop through all videos
+          videos.forEach((video, _i) => {
+            video.pause();
+          });
+
         }
 
       },
