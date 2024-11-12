@@ -114,7 +114,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // swiper scroller triggers
   let swiperEls = document.querySelectorAll(`.swiper`);
 
-  for (let [i, sEl] of swiperEls.entries()) {
+  for (let [, sEl] of swiperEls.entries()) {
     console.log('create tirgger', sEl);
 
     ScrollTrigger.create({
