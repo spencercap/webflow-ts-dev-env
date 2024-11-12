@@ -108,7 +108,34 @@ window.addEventListener('DOMContentLoaded', () => {
       });
     } // end for loop
     
-  }
+  } // end if
+
+
+  // swiper scroller triggers
+  let swiperEls = document.querySelectorAll(`.swiper`);
+
+  for (let [i, sEl] of swiperEls.entries()) {
+    console.log('create tirgger', sEl);
+
+    ScrollTrigger.create({
+      trigger: sEl,
+      start: 'top-=15% center', 
+      end: 'bottom+=4% center', 
+      markers: true,
+
+      onToggle: (e) => {
+        console.log('onToggle', e, sEl);
+        
+        if (e.isActive) {
+          // console.log('workAreaActive', i);
+          (sEl as any).swiper.autoplay.resume();
+        } else {
+          (sEl as any).swiper.autoplay.pause();
+        }
+
+      },
+    });
+  } // end for loop
 
 
   
