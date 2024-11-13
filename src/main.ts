@@ -61,16 +61,20 @@ window.addEventListener('DOMContentLoaded', () => {
 
   
 
-  if (window.innerWidth <= 767) {
+  // if (window.innerWidth <= 767) {
     // @ts-expect-error
     $('.heading-project').addClass('hidden-down'); // init hidden
 
 
-    let workEls = document.querySelectorAll(`.work-wrap-lightbox`);
+    let workWrap1Els = document.querySelectorAll(`.work-wrap-lightbox`);
     
     // @ts-expect-error
-    for (let [i, workEl] of workEls.entries()) {
-      // console.log('create tirgger', tEl);
+    for (let [i, workEl] of workWrap1Els.entries()) {
+      // console.log('create tirgger', workEl);
+
+      // let headEl = workEl.querySelector<HTMLElement>('.heading-project');
+      // console.log('headEl', headEl);
+      
 
       ScrollTrigger.create({
         trigger: workEl,
@@ -112,7 +116,41 @@ window.addEventListener('DOMContentLoaded', () => {
       });
     } // end for loop
     
-  } // end if
+  // } // end if
+
+
+
+  //
+
+  let workWrap2Els = document.querySelectorAll(`.work-wrap`);
+  for (let [_i, workEl] of workWrap2Els.entries()) {
+    // console.log('create tirgger', workEl);
+    let cTitleEl = workEl.querySelector<HTMLElement>('.work-card-title');
+    console.log('cTitleEl', cTitleEl);
+    
+
+    ScrollTrigger.create({
+      trigger: workEl,
+      start: 'top-=30px center', 
+      end: 'bottom+=60px center', 
+      // markers: true,
+
+      onEnter: () => {
+        workEl.querySelector('.work-card-title')?.classList.remove('hidden-down');
+      },
+      onLeave: () => {
+        workEl.querySelector('.work-card-title')?.classList.add('hidden-up');
+      },
+      onEnterBack: () => {
+        workEl.querySelector('.work-card-title')?.classList.remove('hidden-up');
+      },
+      onLeaveBack: () => {
+        workEl.querySelector('.work-card-title')?.classList.add('hidden-down');
+      }
+
+    });
+  } // end for loop
+  
 
 
   // swiper scroller triggers
@@ -125,7 +163,7 @@ window.addEventListener('DOMContentLoaded', () => {
       trigger: sEl,
       start: 'top-=15% center', 
       end: 'bottom+=4% center', 
-      markers: true,
+      // markers: true,
 
       onToggle: (e) => {
         // console.log('onToggle', e, sEl);
