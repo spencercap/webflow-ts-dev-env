@@ -115,7 +115,7 @@ window.addEventListener('DOMContentLoaded', () => {
   let swiperEls = document.querySelectorAll(`.swiper`);
 
   for (let [, sEl] of swiperEls.entries()) {
-    console.log('create tirgger', sEl);
+    // console.log('create tirgger', sEl);
 
     ScrollTrigger.create({
       trigger: sEl,
@@ -124,7 +124,7 @@ window.addEventListener('DOMContentLoaded', () => {
       markers: true,
 
       onToggle: (e) => {
-        console.log('onToggle', e, sEl);
+        // console.log('onToggle', e, sEl);
         
         if (e.isActive) {
           // console.log('workAreaActive', i);
@@ -134,7 +134,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
           // pause videos off-screen 
           const videos = sEl.querySelectorAll<HTMLVideoElement>('.swiper-slide video');
-          console.log('videos', videos);
     
           // Loop through all videos
           videos.forEach((video, _i) => {
