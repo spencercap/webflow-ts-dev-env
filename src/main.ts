@@ -27,7 +27,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   let titleInnerEl = document.querySelector<HTMLElement>(`.title-wrap-inner-2`);
   let tEls = document.querySelectorAll(`.works-cluster`);
-  let offsetAmtY = titleInnerEl!.getBoundingClientRect().height / tEls.length;
+  // let offsetAmtY = titleInnerEl!.getBoundingClientRect().height / tEls.length;
   let titleEls = titleInnerEl!.querySelectorAll('.title-area-2');
 
   for (let [i, tEl] of tEls.entries()) {
