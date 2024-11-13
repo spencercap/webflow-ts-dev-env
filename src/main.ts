@@ -25,9 +25,10 @@ window.addEventListener('DOMContentLoaded', () => {
   // })
 
 
-  let titleInnerEl = document.querySelector<HTMLElement>(`.title-wrap-inner`);
+  let titleInnerEl = document.querySelector<HTMLElement>(`.title-wrap-inner-2`);
   let tEls = document.querySelectorAll(`.works-cluster`);
   let offsetAmtY = titleInnerEl!.getBoundingClientRect().height / tEls.length;
+  let titleEls = titleInnerEl!.querySelectorAll('.title-area-2');
 
   for (let [i, tEl] of tEls.entries()) {
     // console.log('create tirgger', tEl);
@@ -46,7 +47,10 @@ window.addEventListener('DOMContentLoaded', () => {
         if (e.isActive) {
           // console.log('workAreaActive', i);
           // titleInnerEl!.style.transform = `translateY(${i * -69}px)`;
-          titleInnerEl!.style.transform = `translateY(${i * -offsetAmtY}px)`;
+          // titleInnerEl!.style.transform = `translateY(${i * -offsetAmtY}px)`;
+
+          titleEls.forEach(el => el.classList.remove('active'));
+          titleEls[i].classList.add('active');
         } else {
           //
         }
