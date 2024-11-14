@@ -28,7 +28,12 @@ export default defineConfig({
 				// structure: how import path looks
 				'three',
 				'dat.gui'
-			]
+			],
+			output: {
+				entryFileNames: `assets/[name].js`,
+				// chunkFileNames: `assets/[name].js`,
+				// assetFileNames: `assets/[name].[ext]`
+			}
 		},
 	},
 

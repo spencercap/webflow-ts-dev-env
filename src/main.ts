@@ -33,7 +33,7 @@ const bloomStrengthRange = {
 
 const cameraZoomRange = {
     min: 12,
-    max: 41,
+    max: 30,
     speed: -0.2  // Controls oscillation speed
 };
 
@@ -75,6 +75,10 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = params.exposure;
 renderer.setSize(window.innerWidth, window.innerHeight);
+// Add the CSS styles to the canvas
+renderer.domElement.style.position = 'absolute';
+renderer.domElement.style.top = '0';
+
 document.body.appendChild(renderer.domElement);
 
 // Add after scene initialization and before the Lissajous curve code
@@ -441,6 +445,11 @@ window.addEventListener('resize', () => {
 // only show w dev param is present
 if (!window.location.search.includes('dev')) {
     guiElement.style.display = 'none';
+
+	controls.enabled = false;
+	controls.enableZoom = false;
+	controls.enableRotate = false;
+	controls.enablePan = false;
 }
 
 window.addEventListener('DOMContentLoaded', () => {
