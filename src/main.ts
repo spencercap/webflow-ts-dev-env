@@ -167,17 +167,21 @@ window.addEventListener('DOMContentLoaded', () => {
 
       onToggle: (e) => {
         // console.log('onToggle', e, sEl);
+
+        const videos = sEl.querySelectorAll<HTMLVideoElement>('.swiper-slide video');
         
         if (e.isActive) {
           // console.log('workAreaActive', i);
           (sEl as any).swiper.autoplay.resume();
+
+          // Loop through all videos + pause videos off-screen 
+          videos.forEach((video, _i) => {
+            video.play();
+          });
         } else {
           (sEl as any).swiper.autoplay.pause();
-
-          // pause videos off-screen 
-          const videos = sEl.querySelectorAll<HTMLVideoElement>('.swiper-slide video');
     
-          // Loop through all videos
+          // Loop through all videos + pause videos off-screen 
           videos.forEach((video, _i) => {
             video.pause();
           });
