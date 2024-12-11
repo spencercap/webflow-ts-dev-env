@@ -313,7 +313,7 @@ grainPass.uniforms.speed.value = params.grainSpeed;
 // --- GUI ---
 
 // GUI for interactive parameters
-const parentElement = document.querySelector('.bodyreal'); // Your parent element
+// const parentElement = document.querySelector('.bodyreal'); // Your parent element
 // console.log('parentElement', parentElement);
 let gui: GUI | undefined;
 gui = new GUI();
@@ -323,7 +323,8 @@ guiElement.style.zIndex = '9999';
 guiElement.style.position = 'fixed';
 guiElement.style.top = '50px';
 guiElement.style.right = '0px';
-parentElement!.appendChild(gui.domElement);
+// parentElement!.appendChild(gui.domElement);
+document.body.appendChild(gui.domElement);
 
 // Add all your existing GUI controls
 gui.add(params, 'a', 1, 10, 1).onChange(updateLissajousCurve);
@@ -454,6 +455,8 @@ if (!window.location.search.includes('dev')) {
 
 window.addEventListener('DOMContentLoaded', () => {
 	console.log('DOM loaded');
+
+	// document.body.appendChild(renderer.domElement);
 
 	// init pixel size based on screen width (mobile, they are chunkier)
 	let pxVal = Math.min(42, Math.floor(window.innerWidth / 22));
