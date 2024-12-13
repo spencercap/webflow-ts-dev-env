@@ -174,7 +174,7 @@ cubeGroup.children.forEach((cube, index) => createRandomRotation(cube as any, in
 const cubeCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
 // Add after camera setup
-let activeCamera = camera;  // Start with main camera
+let activeCamera = camera as THREE.Camera;  // Start with main camera
 
 // Add keyboard control to switch cameras
 window.addEventListener('keydown', (event) => {
@@ -188,6 +188,10 @@ window.addEventListener('keydown', (event) => {
             activeCamera = orbitingCamera;
         } else if (activeCamera === orbitingCamera) {
             activeCamera = topCamera;
+        } else if (activeCamera === topCamera) {
+            activeCamera = cube20Camera;
+        } else if (activeCamera === cube20Camera) {
+            activeCamera = cube20Camera2;
         } else {
             activeCamera = camera;
         }
@@ -255,6 +259,73 @@ topCamera.lookAt(0, 0, 0);
 
 activeCamera = topCamera;
 
+// After other camera declarations
+const cube20Camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+const targetCube20 = cubeGroup.children[40]; // was 20
+
+// After other camera declarations
+const cube20Camera2 = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
+const targetCube20_2 = cubeGroup.children[50]; // Different cube from the first cube20Camera
+
+// Add after camera declarations
+const cameraMap = {
+    'main': camera,
+    'cube': cubeCamera,
+    'spiral': spiralCamera,
+    'orbiting': orbitingCamera,
+    'top': topCamera,
+    'cube20': cube20Camera,
+    'cube20_2': cube20Camera2
+};
+
+// Add function to update URL
+function updateCameraQueryString(cameraName: string) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('camera', cameraName);
+    window.history.replaceState({}, '', url.toString());
+}
+
+// Add function to get initial camera from URL
+function getInitialCamera(): THREE.Camera {
+    const params = new URLSearchParams(window.location.search);
+    const cameraParam = params.get('camera');
+    return cameraParam && cameraMap[cameraParam as keyof typeof cameraMap] 
+        ? cameraMap[cameraParam as keyof typeof cameraMap] 
+        : camera; // Default to main camera
+}
+
+// Update initial camera assignment
+activeCamera = getInitialCamera();
+
+// Update camera switch event listener
+window.addEventListener('keydown', (event) => {
+    if (event.key === 'c' || event.key === 'C') {
+        console.log('switching camera');
+        if (activeCamera === camera) {
+            activeCamera = cubeCamera;
+            updateCameraQueryString('cube');
+        } else if (activeCamera === cubeCamera) {
+            activeCamera = spiralCamera;
+            updateCameraQueryString('spiral');
+        } else if (activeCamera === spiralCamera) {
+            activeCamera = orbitingCamera;
+            updateCameraQueryString('orbiting');
+        } else if (activeCamera === orbitingCamera) {
+            activeCamera = topCamera;
+            updateCameraQueryString('top');
+        } else if (activeCamera === topCamera) {
+            activeCamera = cube20Camera;
+            updateCameraQueryString('cube20');
+        } else if (activeCamera === cube20Camera) {
+            activeCamera = cube20Camera2;
+            updateCameraQueryString('cube20_2');
+        } else {
+            activeCamera = camera;
+            updateCameraQueryString('main');
+        }
+    }
+});
+
 // Update animate function (removed ascending camera logic)
 function animate() {
     requestAnimationFrame(animate);
@@ -281,6 +352,17 @@ function animate() {
     orbitingCamera.position.z = Math.sin(orbitAngle) * orbitRadius;
     orbitingCamera.position.y = orbitHeight;
     orbitingCamera.lookAt(0, 0, 0);
+    
+    // Update cube20 camera
+    cube20Camera.position.copy(targetCube20.position);
+    cube20Camera.lookAt(0, 0, 0);
+    
+    // Update second cube20 camera
+    const directionToCenter = targetCube20_2.position.clone().negate().normalize();
+    const offsetDistance = 20; // Distance to move camera away from cube
+    cube20Camera2.position.copy(targetCube20_2.position)
+        .add(directionToCenter.multiplyScalar(-offsetDistance));
+    cube20Camera2.lookAt(0, -8, 0);
     
     // Update renderScene to use activeCamera
     renderScene.camera = activeCamera;
