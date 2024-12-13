@@ -21,6 +21,7 @@ export default defineConfig({
 		// },
 
 	},
+	base: '/webflow-ts-dev-env/',
 	build: {
 		// outDir: 'dist',
 		rollupOptions: {
