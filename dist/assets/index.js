@@ -1,4 +1,1664 @@
-import*as u from"three";import{Ray as Et,Plane as xt,MathUtils as Dt,Vector3 as g,Controls as Rt,MOUSE as z,TOUCH as U,Quaternion as ht,Spherical as lt,Vector2 as d,OrthographicCamera as Ot,Mesh as At,BufferGeometry as Lt,Float32BufferAttribute as ct,ShaderMaterial as k,UniformsUtils as tt,WebGLRenderTarget as q,HalfFloatType as J,NoBlending as It,Clock as Nt,Color as et,AdditiveBlending as Ut,MeshBasicMaterial as kt,RawShaderMaterial as jt,ColorManagement as zt,SRGBTransfer as Ft,LinearToneMapping as Bt,ReinhardToneMapping as Ht,CineonToneMapping as Yt,ACESFilmicToneMapping as Qt,AgXToneMapping as Kt,NeutralToneMapping as Wt}from"three";(function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const o of document.querySelectorAll('link[rel="modulepreload"]'))s(o);new MutationObserver(o=>{for(const r of o)if(r.type==="childList")for(const a of r.addedNodes)a.tagName==="LINK"&&a.rel==="modulepreload"&&s(a)}).observe(document,{childList:!0,subtree:!0});function i(o){const r={};return o.integrity&&(r.integrity=o.integrity),o.referrerPolicy&&(r.referrerPolicy=o.referrerPolicy),o.crossOrigin==="use-credentials"?r.credentials="include":o.crossOrigin==="anonymous"?r.credentials="omit":r.credentials="same-origin",r}function s(o){if(o.ep)return;o.ep=!0;const r=i(o);fetch(o.href,r)}})();var T=Object.freeze({Linear:Object.freeze({None:function(e){return e},In:function(e){return e},Out:function(e){return e},InOut:function(e){return e}}),Quadratic:Object.freeze({In:function(e){return e*e},Out:function(e){return e*(2-e)},InOut:function(e){return(e*=2)<1?.5*e*e:-.5*(--e*(e-2)-1)}}),Cubic:Object.freeze({In:function(e){return e*e*e},Out:function(e){return--e*e*e+1},InOut:function(e){return(e*=2)<1?.5*e*e*e:.5*((e-=2)*e*e+2)}}),Quartic:Object.freeze({In:function(e){return e*e*e*e},Out:function(e){return 1- --e*e*e*e},InOut:function(e){return(e*=2)<1?.5*e*e*e*e:-.5*((e-=2)*e*e*e-2)}}),Quintic:Object.freeze({In:function(e){return e*e*e*e*e},Out:function(e){return--e*e*e*e*e+1},InOut:function(e){return(e*=2)<1?.5*e*e*e*e*e:.5*((e-=2)*e*e*e*e+2)}}),Sinusoidal:Object.freeze({In:function(e){return 1-Math.sin((1-e)*Math.PI/2)},Out:function(e){return Math.sin(e*Math.PI/2)},InOut:function(e){return .5*(1-Math.sin(Math.PI*(.5-e)))}}),Exponential:Object.freeze({In:function(e){return e===0?0:Math.pow(1024,e-1)},Out:function(e){return e===1?1:1-Math.pow(2,-10*e)},InOut:function(e){return e===0?0:e===1?1:(e*=2)<1?.5*Math.pow(1024,e-1):.5*(-Math.pow(2,-10*(e-1))+2)}}),Circular:Object.freeze({In:function(e){return 1-Math.sqrt(1-e*e)},Out:function(e){return Math.sqrt(1- --e*e)},InOut:function(e){return(e*=2)<1?-.5*(Math.sqrt(1-e*e)-1):.5*(Math.sqrt(1-(e-=2)*e)+1)}}),Elastic:Object.freeze({In:function(e){return e===0?0:e===1?1:-Math.pow(2,10*(e-1))*Math.sin((e-1.1)*5*Math.PI)},Out:function(e){return e===0?0:e===1?1:Math.pow(2,-10*e)*Math.sin((e-.1)*5*Math.PI)+1},InOut:function(e){return e===0?0:e===1?1:(e*=2,e<1?-.5*Math.pow(2,10*(e-1))*Math.sin((e-1.1)*5*Math.PI):.5*Math.pow(2,-10*(e-1))*Math.sin((e-1.1)*5*Math.PI)+1)}}),Back:Object.freeze({In:function(e){var t=1.70158;return e===1?1:e*e*((t+1)*e-t)},Out:function(e){var t=1.70158;return e===0?0:--e*e*((t+1)*e+t)+1},InOut:function(e){var t=2.5949095;return(e*=2)<1?.5*(e*e*((t+1)*e-t)):.5*((e-=2)*e*((t+1)*e+t)+2)}}),Bounce:Object.freeze({In:function(e){return 1-T.Bounce.Out(1-e)},Out:function(e){return e<1/2.75?7.5625*e*e:e<2/2.75?7.5625*(e-=1.5/2.75)*e+.75:e<2.5/2.75?7.5625*(e-=2.25/2.75)*e+.9375:7.5625*(e-=2.625/2.75)*e+.984375},InOut:function(e){return e<.5?T.Bounce.In(e*2)*.5:T.Bounce.Out(e*2-1)*.5+.5}}),generatePow:function(e){return e===void 0&&(e=4),e=e<Number.EPSILON?Number.EPSILON:e,e=e>1e4?1e4:e,{In:function(t){return Math.pow(t,e)},Out:function(t){return 1-Math.pow(1-t,e)},InOut:function(t){return t<.5?Math.pow(t*2,e)/2:(1-Math.pow(2-t*2,e))/2+.5}}}}),W=function(){return performance.now()},gt=function(){function e(){for(var t=[],i=0;i<arguments.length;i++)t[i]=arguments[i];this._tweens={},this._tweensAddedDuringUpdate={},this.add.apply(this,t)}return e.prototype.getAll=function(){var t=this;return Object.keys(this._tweens).map(function(i){return t._tweens[i]})},e.prototype.removeAll=function(){this._tweens={}},e.prototype.add=function(){for(var t,i=[],s=0;s<arguments.length;s++)i[s]=arguments[s];for(var o=0,r=i;o<r.length;o++){var a=r[o];(t=a._group)===null||t===void 0||t.remove(a),a._group=this,this._tweens[a.getId()]=a,this._tweensAddedDuringUpdate[a.getId()]=a}},e.prototype.remove=function(){for(var t=[],i=0;i<arguments.length;i++)t[i]=arguments[i];for(var s=0,o=t;s<o.length;s++){var r=o[s];r._group=void 0,delete this._tweens[r.getId()],delete this._tweensAddedDuringUpdate[r.getId()]}},e.prototype.allStopped=function(){return this.getAll().every(function(t){return!t.isPlaying()})},e.prototype.update=function(t,i){t===void 0&&(t=W()),i===void 0&&(i=!0);var s=Object.keys(this._tweens);if(s.length!==0)for(;s.length>0;){this._tweensAddedDuringUpdate={};for(var o=0;o<s.length;o++){var r=this._tweens[s[o]],a=!i;r&&r.update(t,a)===!1&&!i&&this.remove(r)}s=Object.keys(this._tweensAddedDuringUpdate)}},e}(),j={Linear:function(e,t){var i=e.length-1,s=i*t,o=Math.floor(s),r=j.Utils.Linear;return t<0?r(e[0],e[1],s):t>1?r(e[i],e[i-1],i-s):r(e[o],e[o+1>i?i:o+1],s-o)},Bezier:function(e,t){for(var i=0,s=e.length-1,o=Math.pow,r=j.Utils.Bernstein,a=0;a<=s;a++)i+=o(1-t,s-a)*o(t,a)*e[a]*r(s,a);return i},CatmullRom:function(e,t){var i=e.length-1,s=i*t,o=Math.floor(s),r=j.Utils.CatmullRom;return e[0]===e[i]?(t<0&&(o=Math.floor(s=i*(1+t))),r(e[(o-1+i)%i],e[o],e[(o+1)%i],e[(o+2)%i],s-o)):t<0?e[0]-(r(e[0],e[0],e[1],e[1],-s)-e[0]):t>1?e[i]-(r(e[i],e[i],e[i-1],e[i-1],s-i)-e[i]):r(e[o?o-1:0],e[o],e[i<o+1?i:o+1],e[i<o+2?i:o+2],s-o)},Utils:{Linear:function(e,t,i){return(t-e)*i+e},Bernstein:function(e,t){var i=j.Utils.Factorial;return i(e)/i(t)/i(e-t)},Factorial:function(){var e=[1];return function(t){var i=1;if(e[t])return e[t];for(var s=t;s>1;s--)i*=s;return e[t]=i,i}}(),CatmullRom:function(e,t,i,s,o){var r=(i-e)*.5,a=(s-t)*.5,n=o*o,h=o*n;return(2*t-2*i+r+a)*h+(-3*t+3*i-2*r-a)*n+r*o+t}}},Gt=function(){function e(){}return e.nextId=function(){return e._nextId++},e._nextId=0,e}(),ot=new gt,K=function(){function e(t,i){this._isPaused=!1,this._pauseStart=0,this._valuesStart={},this._valuesEnd={},this._valuesStartRepeat={},this._duration=1e3,this._isDynamic=!1,this._initialRepeat=0,this._repeat=0,this._yoyo=!1,this._isPlaying=!1,this._reversed=!1,this._delayTime=0,this._startTime=0,this._easingFunction=T.Linear.None,this._interpolationFunction=j.Linear,this._chainedTweens=[],this._onStartCallbackFired=!1,this._onEveryStartCallbackFired=!1,this._id=Gt.nextId(),this._isChainStopped=!1,this._propertiesAreSetUp=!1,this._goToEnd=!1,this._object=t,typeof i=="object"?(this._group=i,i.add(this)):i===!0&&(this._group=ot,ot.add(this))}return e.prototype.getId=function(){return this._id},e.prototype.isPlaying=function(){return this._isPlaying},e.prototype.isPaused=function(){return this._isPaused},e.prototype.getDuration=function(){return this._duration},e.prototype.to=function(t,i){if(i===void 0&&(i=1e3),this._isPlaying)throw new Error("Can not call Tween.to() while Tween is already started or paused. Stop the Tween first.");return this._valuesEnd=t,this._propertiesAreSetUp=!1,this._duration=i<0?0:i,this},e.prototype.duration=function(t){return t===void 0&&(t=1e3),this._duration=t<0?0:t,this},e.prototype.dynamic=function(t){return t===void 0&&(t=!1),this._isDynamic=t,this},e.prototype.start=function(t,i){if(t===void 0&&(t=W()),i===void 0&&(i=!1),this._isPlaying)return this;if(this._repeat=this._initialRepeat,this._reversed){this._reversed=!1;for(var s in this._valuesStartRepeat)this._swapEndStartRepeatValues(s),this._valuesStart[s]=this._valuesStartRepeat[s]}if(this._isPlaying=!0,this._isPaused=!1,this._onStartCallbackFired=!1,this._onEveryStartCallbackFired=!1,this._isChainStopped=!1,this._startTime=t,this._startTime+=this._delayTime,!this._propertiesAreSetUp||i){if(this._propertiesAreSetUp=!0,!this._isDynamic){var o={};for(var r in this._valuesEnd)o[r]=this._valuesEnd[r];this._valuesEnd=o}this._setupProperties(this._object,this._valuesStart,this._valuesEnd,this._valuesStartRepeat,i)}return this},e.prototype.startFromCurrentValues=function(t){return this.start(t,!0)},e.prototype._setupProperties=function(t,i,s,o,r){for(var a in s){var n=t[a],h=Array.isArray(n),p=h?"array":typeof n,m=!h&&Array.isArray(s[a]);if(!(p==="undefined"||p==="function")){if(m){var f=s[a];if(f.length===0)continue;for(var w=[n],y=0,Y=f.length;y<Y;y+=1){var x=this._handleRelativeValue(n,f[y]);if(isNaN(x)){m=!1,console.warn("Found invalid interpolation list. Skipping.");break}w.push(x)}m&&(s[a]=w)}if((p==="object"||h)&&n&&!m){i[a]=h?[]:{};var Q=n;for(var D in Q)i[a][D]=Q[D];o[a]=h?[]:{};var f=s[a];if(!this._isDynamic){var nt={};for(var D in f)nt[D]=f[D];s[a]=f=nt}this._setupProperties(Q,i[a],f,o[a],r)}else(typeof i[a]>"u"||r)&&(i[a]=n),h||(i[a]*=1),m?o[a]=s[a].slice().reverse():o[a]=i[a]||0}}},e.prototype.stop=function(){return this._isChainStopped||(this._isChainStopped=!0,this.stopChainedTweens()),this._isPlaying?(this._isPlaying=!1,this._isPaused=!1,this._onStopCallback&&this._onStopCallback(this._object),this):this},e.prototype.end=function(){return this._goToEnd=!0,this.update(this._startTime+this._duration),this},e.prototype.pause=function(t){return t===void 0&&(t=W()),this._isPaused||!this._isPlaying?this:(this._isPaused=!0,this._pauseStart=t,this)},e.prototype.resume=function(t){return t===void 0&&(t=W()),!this._isPaused||!this._isPlaying?this:(this._isPaused=!1,this._startTime+=t-this._pauseStart,this._pauseStart=0,this)},e.prototype.stopChainedTweens=function(){for(var t=0,i=this._chainedTweens.length;t<i;t++)this._chainedTweens[t].stop();return this},e.prototype.group=function(t){return t?(t.add(this),this):(console.warn("tween.group() without args has been removed, use group.add(tween) instead."),this)},e.prototype.remove=function(){var t;return(t=this._group)===null||t===void 0||t.remove(this),this},e.prototype.delay=function(t){return t===void 0&&(t=0),this._delayTime=t,this},e.prototype.repeat=function(t){return t===void 0&&(t=0),this._initialRepeat=t,this._repeat=t,this},e.prototype.repeatDelay=function(t){return this._repeatDelayTime=t,this},e.prototype.yoyo=function(t){return t===void 0&&(t=!1),this._yoyo=t,this},e.prototype.easing=function(t){return t===void 0&&(t=T.Linear.None),this._easingFunction=t,this},e.prototype.interpolation=function(t){return t===void 0&&(t=j.Linear),this._interpolationFunction=t,this},e.prototype.chain=function(){for(var t=[],i=0;i<arguments.length;i++)t[i]=arguments[i];return this._chainedTweens=t,this},e.prototype.onStart=function(t){return this._onStartCallback=t,this},e.prototype.onEveryStart=function(t){return this._onEveryStartCallback=t,this},e.prototype.onUpdate=function(t){return this._onUpdateCallback=t,this},e.prototype.onRepeat=function(t){return this._onRepeatCallback=t,this},e.prototype.onComplete=function(t){return this._onCompleteCallback=t,this},e.prototype.onStop=function(t){return this._onStopCallback=t,this},e.prototype.update=function(t,i){var s=this,o;if(t===void 0&&(t=W()),i===void 0&&(i=e.autoStartOnUpdate),this._isPaused)return!0;var r;if(!this._goToEnd&&!this._isPlaying)if(i)this.start(t,!0);else return!1;if(this._goToEnd=!1,t<this._startTime)return!0;this._onStartCallbackFired===!1&&(this._onStartCallback&&this._onStartCallback(this._object),this._onStartCallbackFired=!0),this._onEveryStartCallbackFired===!1&&(this._onEveryStartCallback&&this._onEveryStartCallback(this._object),this._onEveryStartCallbackFired=!0);var a=t-this._startTime,n=this._duration+((o=this._repeatDelayTime)!==null&&o!==void 0?o:this._delayTime),h=this._duration+this._repeat*n,p=function(){if(s._duration===0||a>h)return 1;var x=Math.trunc(a/n),Q=a-x*n,D=Math.min(Q/s._duration,1);return D===0&&a===s._duration?1:D},m=p(),f=this._easingFunction(m);if(this._updateProperties(this._object,this._valuesStart,this._valuesEnd,f),this._onUpdateCallback&&this._onUpdateCallback(this._object,m),this._duration===0||a>=this._duration)if(this._repeat>0){var w=Math.min(Math.trunc((a-this._duration)/n)+1,this._repeat);isFinite(this._repeat)&&(this._repeat-=w);for(r in this._valuesStartRepeat)!this._yoyo&&typeof this._valuesEnd[r]=="string"&&(this._valuesStartRepeat[r]=this._valuesStartRepeat[r]+parseFloat(this._valuesEnd[r])),this._yoyo&&this._swapEndStartRepeatValues(r),this._valuesStart[r]=this._valuesStartRepeat[r];return this._yoyo&&(this._reversed=!this._reversed),this._startTime+=n*w,this._onRepeatCallback&&this._onRepeatCallback(this._object),this._onEveryStartCallbackFired=!1,!0}else{this._onCompleteCallback&&this._onCompleteCallback(this._object);for(var y=0,Y=this._chainedTweens.length;y<Y;y++)this._chainedTweens[y].start(this._startTime+this._duration,!1);return this._isPlaying=!1,!1}return!0},e.prototype._updateProperties=function(t,i,s,o){for(var r in s)if(i[r]!==void 0){var a=i[r]||0,n=s[r],h=Array.isArray(t[r]),p=Array.isArray(n),m=!h&&p;m?t[r]=this._interpolationFunction(n,o):typeof n=="object"&&n?this._updateProperties(t[r],a,n,o):(n=this._handleRelativeValue(a,n),typeof n=="number"&&(t[r]=a+(n-a)*o))}},e.prototype._handleRelativeValue=function(t,i){return typeof i!="string"?i:i.charAt(0)==="+"||i.charAt(0)==="-"?t+parseFloat(i):parseFloat(i)},e.prototype._swapEndStartRepeatValues=function(t){var i=this._valuesStartRepeat[t],s=this._valuesEnd[t];typeof s=="string"?this._valuesStartRepeat[t]=this._valuesStartRepeat[t]+parseFloat(s):this._valuesStartRepeat[t]=this._valuesEnd[t],this._valuesEnd[t]=i},e.autoStartOnUpdate=!1,e}(),M=ot;M.getAll.bind(M);M.removeAll.bind(M);M.add.bind(M);M.remove.bind(M);M.update.bind(M);const ut={type:"change"},rt={type:"start"},bt={type:"end"},X=new Et,ft=new xt,Zt=Math.cos(70*Dt.DEG2RAD),_=new g,v=2*Math.PI,c={NONE:-1,ROTATE:0,DOLLY:1,PAN:2,TOUCH_ROTATE:3,TOUCH_PAN:4,TOUCH_DOLLY_PAN:5,TOUCH_DOLLY_ROTATE:6},it=1e-6;class Xt extends Rt{constructor(t,i=null){super(t,i),this.state=c.NONE,this.enabled=!0,this.target=new g,this.cursor=new g,this.minDistance=0,this.maxDistance=1/0,this.minZoom=0,this.maxZoom=1/0,this.minTargetRadius=0,this.maxTargetRadius=1/0,this.minPolarAngle=0,this.maxPolarAngle=Math.PI,this.minAzimuthAngle=-1/0,this.maxAzimuthAngle=1/0,this.enableDamping=!1,this.dampingFactor=.05,this.enableZoom=!0,this.zoomSpeed=1,this.enableRotate=!0,this.rotateSpeed=1,this.enablePan=!0,this.panSpeed=1,this.screenSpacePanning=!0,this.keyPanSpeed=7,this.zoomToCursor=!1,this.autoRotate=!1,this.autoRotateSpeed=2,this.keys={LEFT:"ArrowLeft",UP:"ArrowUp",RIGHT:"ArrowRight",BOTTOM:"ArrowDown"},this.mouseButtons={LEFT:z.ROTATE,MIDDLE:z.DOLLY,RIGHT:z.PAN},this.touches={ONE:U.ROTATE,TWO:U.DOLLY_PAN},this.target0=this.target.clone(),this.position0=this.object.position.clone(),this.zoom0=this.object.zoom,this._domElementKeyEvents=null,this._lastPosition=new g,this._lastQuaternion=new ht,this._lastTargetPosition=new g,this._quat=new ht().setFromUnitVectors(t.up,new g(0,1,0)),this._quatInverse=this._quat.clone().invert(),this._spherical=new lt,this._sphericalDelta=new lt,this._scale=1,this._panOffset=new g,this._rotateStart=new d,this._rotateEnd=new d,this._rotateDelta=new d,this._panStart=new d,this._panEnd=new d,this._panDelta=new d,this._dollyStart=new d,this._dollyEnd=new d,this._dollyDelta=new d,this._dollyDirection=new g,this._mouse=new d,this._performCursorZoom=!1,this._pointers=[],this._pointerPositions={},this._controlActive=!1,this._onPointerMove=qt.bind(this),this._onPointerDown=Vt.bind(this),this._onPointerUp=Jt.bind(this),this._onContextMenu=re.bind(this),this._onMouseWheel=ee.bind(this),this._onKeyDown=ie.bind(this),this._onTouchStart=se.bind(this),this._onTouchMove=oe.bind(this),this._onMouseDown=$t.bind(this),this._onMouseMove=te.bind(this),this._interceptControlDown=ae.bind(this),this._interceptControlUp=ne.bind(this),this.domElement!==null&&this.connect(),this.update()}connect(){this.domElement.addEventListener("pointerdown",this._onPointerDown),this.domElement.addEventListener("pointercancel",this._onPointerUp),this.domElement.addEventListener("contextmenu",this._onContextMenu),this.domElement.addEventListener("wheel",this._onMouseWheel,{passive:!1}),this.domElement.getRootNode().addEventListener("keydown",this._interceptControlDown,{passive:!0,capture:!0}),this.domElement.style.touchAction="none"}disconnect(){this.domElement.removeEventListener("pointerdown",this._onPointerDown),this.domElement.removeEventListener("pointermove",this._onPointerMove),this.domElement.removeEventListener("pointerup",this._onPointerUp),this.domElement.removeEventListener("pointercancel",this._onPointerUp),this.domElement.removeEventListener("wheel",this._onMouseWheel),this.domElement.removeEventListener("contextmenu",this._onContextMenu),this.stopListenToKeyEvents(),this.domElement.getRootNode().removeEventListener("keydown",this._interceptControlDown,{capture:!0}),this.domElement.style.touchAction="auto"}dispose(){this.disconnect()}getPolarAngle(){return this._spherical.phi}getAzimuthalAngle(){return this._spherical.theta}getDistance(){return this.object.position.distanceTo(this.target)}listenToKeyEvents(t){t.addEventListener("keydown",this._onKeyDown),this._domElementKeyEvents=t}stopListenToKeyEvents(){this._domElementKeyEvents!==null&&(this._domElementKeyEvents.removeEventListener("keydown",this._onKeyDown),this._domElementKeyEvents=null)}saveState(){this.target0.copy(this.target),this.position0.copy(this.object.position),this.zoom0=this.object.zoom}reset(){this.target.copy(this.target0),this.object.position.copy(this.position0),this.object.zoom=this.zoom0,this.object.updateProjectionMatrix(),this.dispatchEvent(ut),this.update(),this.state=c.NONE}update(t=null){const i=this.object.position;_.copy(i).sub(this.target),_.applyQuaternion(this._quat),this._spherical.setFromVector3(_),this.autoRotate&&this.state===c.NONE&&this._rotateLeft(this._getAutoRotationAngle(t)),this.enableDamping?(this._spherical.theta+=this._sphericalDelta.theta*this.dampingFactor,this._spherical.phi+=this._sphericalDelta.phi*this.dampingFactor):(this._spherical.theta+=this._sphericalDelta.theta,this._spherical.phi+=this._sphericalDelta.phi);let s=this.minAzimuthAngle,o=this.maxAzimuthAngle;isFinite(s)&&isFinite(o)&&(s<-Math.PI?s+=v:s>Math.PI&&(s-=v),o<-Math.PI?o+=v:o>Math.PI&&(o-=v),s<=o?this._spherical.theta=Math.max(s,Math.min(o,this._spherical.theta)):this._spherical.theta=this._spherical.theta>(s+o)/2?Math.max(s,this._spherical.theta):Math.min(o,this._spherical.theta)),this._spherical.phi=Math.max(this.minPolarAngle,Math.min(this.maxPolarAngle,this._spherical.phi)),this._spherical.makeSafe(),this.enableDamping===!0?this.target.addScaledVector(this._panOffset,this.dampingFactor):this.target.add(this._panOffset),this.target.sub(this.cursor),this.target.clampLength(this.minTargetRadius,this.maxTargetRadius),this.target.add(this.cursor);let r=!1;if(this.zoomToCursor&&this._performCursorZoom||this.object.isOrthographicCamera)this._spherical.radius=this._clampDistance(this._spherical.radius);else{const a=this._spherical.radius;this._spherical.radius=this._clampDistance(this._spherical.radius*this._scale),r=a!=this._spherical.radius}if(_.setFromSpherical(this._spherical),_.applyQuaternion(this._quatInverse),i.copy(this.target).add(_),this.object.lookAt(this.target),this.enableDamping===!0?(this._sphericalDelta.theta*=1-this.dampingFactor,this._sphericalDelta.phi*=1-this.dampingFactor,this._panOffset.multiplyScalar(1-this.dampingFactor)):(this._sphericalDelta.set(0,0,0),this._panOffset.set(0,0,0)),this.zoomToCursor&&this._performCursorZoom){let a=null;if(this.object.isPerspectiveCamera){const n=_.length();a=this._clampDistance(n*this._scale);const h=n-a;this.object.position.addScaledVector(this._dollyDirection,h),this.object.updateMatrixWorld(),r=!!h}else if(this.object.isOrthographicCamera){const n=new g(this._mouse.x,this._mouse.y,0);n.unproject(this.object);const h=this.object.zoom;this.object.zoom=Math.max(this.minZoom,Math.min(this.maxZoom,this.object.zoom/this._scale)),this.object.updateProjectionMatrix(),r=h!==this.object.zoom;const p=new g(this._mouse.x,this._mouse.y,0);p.unproject(this.object),this.object.position.sub(p).add(n),this.object.updateMatrixWorld(),a=_.length()}else console.warn("WARNING: OrbitControls.js encountered an unknown camera type - zoom to cursor disabled."),this.zoomToCursor=!1;a!==null&&(this.screenSpacePanning?this.target.set(0,0,-1).transformDirection(this.object.matrix).multiplyScalar(a).add(this.object.position):(X.origin.copy(this.object.position),X.direction.set(0,0,-1).transformDirection(this.object.matrix),Math.abs(this.object.up.dot(X.direction))<Zt?this.object.lookAt(this.target):(ft.setFromNormalAndCoplanarPoint(this.object.up,this.target),X.intersectPlane(ft,this.target))))}else if(this.object.isOrthographicCamera){const a=this.object.zoom;this.object.zoom=Math.max(this.minZoom,Math.min(this.maxZoom,this.object.zoom/this._scale)),a!==this.object.zoom&&(this.object.updateProjectionMatrix(),r=!0)}return this._scale=1,this._performCursorZoom=!1,r||this._lastPosition.distanceToSquared(this.object.position)>it||8*(1-this._lastQuaternion.dot(this.object.quaternion))>it||this._lastTargetPosition.distanceToSquared(this.target)>it?(this.dispatchEvent(ut),this._lastPosition.copy(this.object.position),this._lastQuaternion.copy(this.object.quaternion),this._lastTargetPosition.copy(this.target),!0):!1}_getAutoRotationAngle(t){return t!==null?v/60*this.autoRotateSpeed*t:v/60/60*this.autoRotateSpeed}_getZoomScale(t){const i=Math.abs(t*.01);return Math.pow(.95,this.zoomSpeed*i)}_rotateLeft(t){this._sphericalDelta.theta-=t}_rotateUp(t){this._sphericalDelta.phi-=t}_panLeft(t,i){_.setFromMatrixColumn(i,0),_.multiplyScalar(-t),this._panOffset.add(_)}_panUp(t,i){this.screenSpacePanning===!0?_.setFromMatrixColumn(i,1):(_.setFromMatrixColumn(i,0),_.crossVectors(this.object.up,_)),_.multiplyScalar(t),this._panOffset.add(_)}_pan(t,i){const s=this.domElement;if(this.object.isPerspectiveCamera){const o=this.object.position;_.copy(o).sub(this.target);let r=_.length();r*=Math.tan(this.object.fov/2*Math.PI/180),this._panLeft(2*t*r/s.clientHeight,this.object.matrix),this._panUp(2*i*r/s.clientHeight,this.object.matrix)}else this.object.isOrthographicCamera?(this._panLeft(t*(this.object.right-this.object.left)/this.object.zoom/s.clientWidth,this.object.matrix),this._panUp(i*(this.object.top-this.object.bottom)/this.object.zoom/s.clientHeight,this.object.matrix)):(console.warn("WARNING: OrbitControls.js encountered an unknown camera type - pan disabled."),this.enablePan=!1)}_dollyOut(t){this.object.isPerspectiveCamera||this.object.isOrthographicCamera?this._scale/=t:(console.warn("WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled."),this.enableZoom=!1)}_dollyIn(t){this.object.isPerspectiveCamera||this.object.isOrthographicCamera?this._scale*=t:(console.warn("WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled."),this.enableZoom=!1)}_updateZoomParameters(t,i){if(!this.zoomToCursor)return;this._performCursorZoom=!0;const s=this.domElement.getBoundingClientRect(),o=t-s.left,r=i-s.top,a=s.width,n=s.height;this._mouse.x=o/a*2-1,this._mouse.y=-(r/n)*2+1,this._dollyDirection.set(this._mouse.x,this._mouse.y,1).unproject(this.object).sub(this.object.position).normalize()}_clampDistance(t){return Math.max(this.minDistance,Math.min(this.maxDistance,t))}_handleMouseDownRotate(t){this._rotateStart.set(t.clientX,t.clientY)}_handleMouseDownDolly(t){this._updateZoomParameters(t.clientX,t.clientX),this._dollyStart.set(t.clientX,t.clientY)}_handleMouseDownPan(t){this._panStart.set(t.clientX,t.clientY)}_handleMouseMoveRotate(t){this._rotateEnd.set(t.clientX,t.clientY),this._rotateDelta.subVectors(this._rotateEnd,this._rotateStart).multiplyScalar(this.rotateSpeed);const i=this.domElement;this._rotateLeft(v*this._rotateDelta.x/i.clientHeight),this._rotateUp(v*this._rotateDelta.y/i.clientHeight),this._rotateStart.copy(this._rotateEnd),this.update()}_handleMouseMoveDolly(t){this._dollyEnd.set(t.clientX,t.clientY),this._dollyDelta.subVectors(this._dollyEnd,this._dollyStart),this._dollyDelta.y>0?this._dollyOut(this._getZoomScale(this._dollyDelta.y)):this._dollyDelta.y<0&&this._dollyIn(this._getZoomScale(this._dollyDelta.y)),this._dollyStart.copy(this._dollyEnd),this.update()}_handleMouseMovePan(t){this._panEnd.set(t.clientX,t.clientY),this._panDelta.subVectors(this._panEnd,this._panStart).multiplyScalar(this.panSpeed),this._pan(this._panDelta.x,this._panDelta.y),this._panStart.copy(this._panEnd),this.update()}_handleMouseWheel(t){this._updateZoomParameters(t.clientX,t.clientY),t.deltaY<0?this._dollyIn(this._getZoomScale(t.deltaY)):t.deltaY>0&&this._dollyOut(this._getZoomScale(t.deltaY)),this.update()}_handleKeyDown(t){let i=!1;switch(t.code){case this.keys.UP:t.ctrlKey||t.metaKey||t.shiftKey?this._rotateUp(v*this.rotateSpeed/this.domElement.clientHeight):this._pan(0,this.keyPanSpeed),i=!0;break;case this.keys.BOTTOM:t.ctrlKey||t.metaKey||t.shiftKey?this._rotateUp(-v*this.rotateSpeed/this.domElement.clientHeight):this._pan(0,-this.keyPanSpeed),i=!0;break;case this.keys.LEFT:t.ctrlKey||t.metaKey||t.shiftKey?this._rotateLeft(v*this.rotateSpeed/this.domElement.clientHeight):this._pan(this.keyPanSpeed,0),i=!0;break;case this.keys.RIGHT:t.ctrlKey||t.metaKey||t.shiftKey?this._rotateLeft(-v*this.rotateSpeed/this.domElement.clientHeight):this._pan(-this.keyPanSpeed,0),i=!0;break}i&&(t.preventDefault(),this.update())}_handleTouchStartRotate(t){if(this._pointers.length===1)this._rotateStart.set(t.pageX,t.pageY);else{const i=this._getSecondPointerPosition(t),s=.5*(t.pageX+i.x),o=.5*(t.pageY+i.y);this._rotateStart.set(s,o)}}_handleTouchStartPan(t){if(this._pointers.length===1)this._panStart.set(t.pageX,t.pageY);else{const i=this._getSecondPointerPosition(t),s=.5*(t.pageX+i.x),o=.5*(t.pageY+i.y);this._panStart.set(s,o)}}_handleTouchStartDolly(t){const i=this._getSecondPointerPosition(t),s=t.pageX-i.x,o=t.pageY-i.y,r=Math.sqrt(s*s+o*o);this._dollyStart.set(0,r)}_handleTouchStartDollyPan(t){this.enableZoom&&this._handleTouchStartDolly(t),this.enablePan&&this._handleTouchStartPan(t)}_handleTouchStartDollyRotate(t){this.enableZoom&&this._handleTouchStartDolly(t),this.enableRotate&&this._handleTouchStartRotate(t)}_handleTouchMoveRotate(t){if(this._pointers.length==1)this._rotateEnd.set(t.pageX,t.pageY);else{const s=this._getSecondPointerPosition(t),o=.5*(t.pageX+s.x),r=.5*(t.pageY+s.y);this._rotateEnd.set(o,r)}this._rotateDelta.subVectors(this._rotateEnd,this._rotateStart).multiplyScalar(this.rotateSpeed);const i=this.domElement;this._rotateLeft(v*this._rotateDelta.x/i.clientHeight),this._rotateUp(v*this._rotateDelta.y/i.clientHeight),this._rotateStart.copy(this._rotateEnd)}_handleTouchMovePan(t){if(this._pointers.length===1)this._panEnd.set(t.pageX,t.pageY);else{const i=this._getSecondPointerPosition(t),s=.5*(t.pageX+i.x),o=.5*(t.pageY+i.y);this._panEnd.set(s,o)}this._panDelta.subVectors(this._panEnd,this._panStart).multiplyScalar(this.panSpeed),this._pan(this._panDelta.x,this._panDelta.y),this._panStart.copy(this._panEnd)}_handleTouchMoveDolly(t){const i=this._getSecondPointerPosition(t),s=t.pageX-i.x,o=t.pageY-i.y,r=Math.sqrt(s*s+o*o);this._dollyEnd.set(0,r),this._dollyDelta.set(0,Math.pow(this._dollyEnd.y/this._dollyStart.y,this.zoomSpeed)),this._dollyOut(this._dollyDelta.y),this._dollyStart.copy(this._dollyEnd);const a=(t.pageX+i.x)*.5,n=(t.pageY+i.y)*.5;this._updateZoomParameters(a,n)}_handleTouchMoveDollyPan(t){this.enableZoom&&this._handleTouchMoveDolly(t),this.enablePan&&this._handleTouchMovePan(t)}_handleTouchMoveDollyRotate(t){this.enableZoom&&this._handleTouchMoveDolly(t),this.enableRotate&&this._handleTouchMoveRotate(t)}_addPointer(t){this._pointers.push(t.pointerId)}_removePointer(t){delete this._pointerPositions[t.pointerId];for(let i=0;i<this._pointers.length;i++)if(this._pointers[i]==t.pointerId){this._pointers.splice(i,1);return}}_isTrackingPointer(t){for(let i=0;i<this._pointers.length;i++)if(this._pointers[i]==t.pointerId)return!0;return!1}_trackPointer(t){let i=this._pointerPositions[t.pointerId];i===void 0&&(i=new d,this._pointerPositions[t.pointerId]=i),i.set(t.pageX,t.pageY)}_getSecondPointerPosition(t){const i=t.pointerId===this._pointers[0]?this._pointers[1]:this._pointers[0];return this._pointerPositions[i]}_customWheelEvent(t){const i=t.deltaMode,s={clientX:t.clientX,clientY:t.clientY,deltaY:t.deltaY};switch(i){case 1:s.deltaY*=16;break;case 2:s.deltaY*=100;break}return t.ctrlKey&&!this._controlActive&&(s.deltaY*=10),s}}function Vt(e){this.enabled!==!1&&(this._pointers.length===0&&(this.domElement.setPointerCapture(e.pointerId),this.domElement.addEventListener("pointermove",this._onPointerMove),this.domElement.addEventListener("pointerup",this._onPointerUp)),!this._isTrackingPointer(e)&&(this._addPointer(e),e.pointerType==="touch"?this._onTouchStart(e):this._onMouseDown(e)))}function qt(e){this.enabled!==!1&&(e.pointerType==="touch"?this._onTouchMove(e):this._onMouseMove(e))}function Jt(e){switch(this._removePointer(e),this._pointers.length){case 0:this.domElement.releasePointerCapture(e.pointerId),this.domElement.removeEventListener("pointermove",this._onPointerMove),this.domElement.removeEventListener("pointerup",this._onPointerUp),this.dispatchEvent(bt),this.state=c.NONE;break;case 1:const t=this._pointers[0],i=this._pointerPositions[t];this._onTouchStart({pointerId:t,pageX:i.x,pageY:i.y});break}}function $t(e){let t;switch(e.button){case 0:t=this.mouseButtons.LEFT;break;case 1:t=this.mouseButtons.MIDDLE;break;case 2:t=this.mouseButtons.RIGHT;break;default:t=-1}switch(t){case z.DOLLY:if(this.enableZoom===!1)return;this._handleMouseDownDolly(e),this.state=c.DOLLY;break;case z.ROTATE:if(e.ctrlKey||e.metaKey||e.shiftKey){if(this.enablePan===!1)return;this._handleMouseDownPan(e),this.state=c.PAN}else{if(this.enableRotate===!1)return;this._handleMouseDownRotate(e),this.state=c.ROTATE}break;case z.PAN:if(e.ctrlKey||e.metaKey||e.shiftKey){if(this.enableRotate===!1)return;this._handleMouseDownRotate(e),this.state=c.ROTATE}else{if(this.enablePan===!1)return;this._handleMouseDownPan(e),this.state=c.PAN}break;default:this.state=c.NONE}this.state!==c.NONE&&this.dispatchEvent(rt)}function te(e){switch(this.state){case c.ROTATE:if(this.enableRotate===!1)return;this._handleMouseMoveRotate(e);break;case c.DOLLY:if(this.enableZoom===!1)return;this._handleMouseMoveDolly(e);break;case c.PAN:if(this.enablePan===!1)return;this._handleMouseMovePan(e);break}}function ee(e){this.enabled===!1||this.enableZoom===!1||this.state!==c.NONE||(e.preventDefault(),this.dispatchEvent(rt),this._handleMouseWheel(this._customWheelEvent(e)),this.dispatchEvent(bt))}function ie(e){this.enabled===!1||this.enablePan===!1||this._handleKeyDown(e)}function se(e){switch(this._trackPointer(e),this._pointers.length){case 1:switch(this.touches.ONE){case U.ROTATE:if(this.enableRotate===!1)return;this._handleTouchStartRotate(e),this.state=c.TOUCH_ROTATE;break;case U.PAN:if(this.enablePan===!1)return;this._handleTouchStartPan(e),this.state=c.TOUCH_PAN;break;default:this.state=c.NONE}break;case 2:switch(this.touches.TWO){case U.DOLLY_PAN:if(this.enableZoom===!1&&this.enablePan===!1)return;this._handleTouchStartDollyPan(e),this.state=c.TOUCH_DOLLY_PAN;break;case U.DOLLY_ROTATE:if(this.enableZoom===!1&&this.enableRotate===!1)return;this._handleTouchStartDollyRotate(e),this.state=c.TOUCH_DOLLY_ROTATE;break;default:this.state=c.NONE}break;default:this.state=c.NONE}this.state!==c.NONE&&this.dispatchEvent(rt)}function oe(e){switch(this._trackPointer(e),this.state){case c.TOUCH_ROTATE:if(this.enableRotate===!1)return;this._handleTouchMoveRotate(e),this.update();break;case c.TOUCH_PAN:if(this.enablePan===!1)return;this._handleTouchMovePan(e),this.update();break;case c.TOUCH_DOLLY_PAN:if(this.enableZoom===!1&&this.enablePan===!1)return;this._handleTouchMoveDollyPan(e),this.update();break;case c.TOUCH_DOLLY_ROTATE:if(this.enableZoom===!1&&this.enableRotate===!1)return;this._handleTouchMoveDollyRotate(e),this.update();break;default:this.state=c.NONE}}function re(e){this.enabled!==!1&&e.preventDefault()}function ae(e){e.key==="Control"&&(this._controlActive=!0,this.domElement.getRootNode().addEventListener("keyup",this._interceptControlUp,{passive:!0,capture:!0}))}function ne(e){e.key==="Control"&&(this._controlActive=!1,this.domElement.getRootNode().removeEventListener("keyup",this._interceptControlUp,{passive:!0,capture:!0}))}const vt={name:"CopyShader",uniforms:{tDiffuse:{value:null},opacity:{value:1}},vertexShader:`
+import * as THREE from "three";
+import { Ray, Plane, MathUtils, Vector3, Controls, MOUSE, TOUCH, Quaternion, Spherical, Vector2, OrthographicCamera, Mesh, BufferGeometry, Float32BufferAttribute, ShaderMaterial, UniformsUtils, WebGLRenderTarget, HalfFloatType, NoBlending, Clock, Color, AdditiveBlending, MeshBasicMaterial, RawShaderMaterial, ColorManagement, SRGBTransfer, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping } from "three";
+(function polyfill() {
+  const relList = document.createElement("link").relList;
+  if (relList && relList.supports && relList.supports("modulepreload")) {
+    return;
+  }
+  for (const link of document.querySelectorAll('link[rel="modulepreload"]')) {
+    processPreload(link);
+  }
+  new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type !== "childList") {
+        continue;
+      }
+      for (const node of mutation.addedNodes) {
+        if (node.tagName === "LINK" && node.rel === "modulepreload")
+          processPreload(node);
+      }
+    }
+  }).observe(document, { childList: true, subtree: true });
+  function getFetchOpts(link) {
+    const fetchOpts = {};
+    if (link.integrity) fetchOpts.integrity = link.integrity;
+    if (link.referrerPolicy) fetchOpts.referrerPolicy = link.referrerPolicy;
+    if (link.crossOrigin === "use-credentials")
+      fetchOpts.credentials = "include";
+    else if (link.crossOrigin === "anonymous") fetchOpts.credentials = "omit";
+    else fetchOpts.credentials = "same-origin";
+    return fetchOpts;
+  }
+  function processPreload(link) {
+    if (link.ep)
+      return;
+    link.ep = true;
+    const fetchOpts = getFetchOpts(link);
+    fetch(link.href, fetchOpts);
+  }
+})();
+var Easing = Object.freeze({
+  Linear: Object.freeze({
+    None: function(amount) {
+      return amount;
+    },
+    In: function(amount) {
+      return amount;
+    },
+    Out: function(amount) {
+      return amount;
+    },
+    InOut: function(amount) {
+      return amount;
+    }
+  }),
+  Quadratic: Object.freeze({
+    In: function(amount) {
+      return amount * amount;
+    },
+    Out: function(amount) {
+      return amount * (2 - amount);
+    },
+    InOut: function(amount) {
+      if ((amount *= 2) < 1) {
+        return 0.5 * amount * amount;
+      }
+      return -0.5 * (--amount * (amount - 2) - 1);
+    }
+  }),
+  Cubic: Object.freeze({
+    In: function(amount) {
+      return amount * amount * amount;
+    },
+    Out: function(amount) {
+      return --amount * amount * amount + 1;
+    },
+    InOut: function(amount) {
+      if ((amount *= 2) < 1) {
+        return 0.5 * amount * amount * amount;
+      }
+      return 0.5 * ((amount -= 2) * amount * amount + 2);
+    }
+  }),
+  Quartic: Object.freeze({
+    In: function(amount) {
+      return amount * amount * amount * amount;
+    },
+    Out: function(amount) {
+      return 1 - --amount * amount * amount * amount;
+    },
+    InOut: function(amount) {
+      if ((amount *= 2) < 1) {
+        return 0.5 * amount * amount * amount * amount;
+      }
+      return -0.5 * ((amount -= 2) * amount * amount * amount - 2);
+    }
+  }),
+  Quintic: Object.freeze({
+    In: function(amount) {
+      return amount * amount * amount * amount * amount;
+    },
+    Out: function(amount) {
+      return --amount * amount * amount * amount * amount + 1;
+    },
+    InOut: function(amount) {
+      if ((amount *= 2) < 1) {
+        return 0.5 * amount * amount * amount * amount * amount;
+      }
+      return 0.5 * ((amount -= 2) * amount * amount * amount * amount + 2);
+    }
+  }),
+  Sinusoidal: Object.freeze({
+    In: function(amount) {
+      return 1 - Math.sin((1 - amount) * Math.PI / 2);
+    },
+    Out: function(amount) {
+      return Math.sin(amount * Math.PI / 2);
+    },
+    InOut: function(amount) {
+      return 0.5 * (1 - Math.sin(Math.PI * (0.5 - amount)));
+    }
+  }),
+  Exponential: Object.freeze({
+    In: function(amount) {
+      return amount === 0 ? 0 : Math.pow(1024, amount - 1);
+    },
+    Out: function(amount) {
+      return amount === 1 ? 1 : 1 - Math.pow(2, -10 * amount);
+    },
+    InOut: function(amount) {
+      if (amount === 0) {
+        return 0;
+      }
+      if (amount === 1) {
+        return 1;
+      }
+      if ((amount *= 2) < 1) {
+        return 0.5 * Math.pow(1024, amount - 1);
+      }
+      return 0.5 * (-Math.pow(2, -10 * (amount - 1)) + 2);
+    }
+  }),
+  Circular: Object.freeze({
+    In: function(amount) {
+      return 1 - Math.sqrt(1 - amount * amount);
+    },
+    Out: function(amount) {
+      return Math.sqrt(1 - --amount * amount);
+    },
+    InOut: function(amount) {
+      if ((amount *= 2) < 1) {
+        return -0.5 * (Math.sqrt(1 - amount * amount) - 1);
+      }
+      return 0.5 * (Math.sqrt(1 - (amount -= 2) * amount) + 1);
+    }
+  }),
+  Elastic: Object.freeze({
+    In: function(amount) {
+      if (amount === 0) {
+        return 0;
+      }
+      if (amount === 1) {
+        return 1;
+      }
+      return -Math.pow(2, 10 * (amount - 1)) * Math.sin((amount - 1.1) * 5 * Math.PI);
+    },
+    Out: function(amount) {
+      if (amount === 0) {
+        return 0;
+      }
+      if (amount === 1) {
+        return 1;
+      }
+      return Math.pow(2, -10 * amount) * Math.sin((amount - 0.1) * 5 * Math.PI) + 1;
+    },
+    InOut: function(amount) {
+      if (amount === 0) {
+        return 0;
+      }
+      if (amount === 1) {
+        return 1;
+      }
+      amount *= 2;
+      if (amount < 1) {
+        return -0.5 * Math.pow(2, 10 * (amount - 1)) * Math.sin((amount - 1.1) * 5 * Math.PI);
+      }
+      return 0.5 * Math.pow(2, -10 * (amount - 1)) * Math.sin((amount - 1.1) * 5 * Math.PI) + 1;
+    }
+  }),
+  Back: Object.freeze({
+    In: function(amount) {
+      var s = 1.70158;
+      return amount === 1 ? 1 : amount * amount * ((s + 1) * amount - s);
+    },
+    Out: function(amount) {
+      var s = 1.70158;
+      return amount === 0 ? 0 : --amount * amount * ((s + 1) * amount + s) + 1;
+    },
+    InOut: function(amount) {
+      var s = 1.70158 * 1.525;
+      if ((amount *= 2) < 1) {
+        return 0.5 * (amount * amount * ((s + 1) * amount - s));
+      }
+      return 0.5 * ((amount -= 2) * amount * ((s + 1) * amount + s) + 2);
+    }
+  }),
+  Bounce: Object.freeze({
+    In: function(amount) {
+      return 1 - Easing.Bounce.Out(1 - amount);
+    },
+    Out: function(amount) {
+      if (amount < 1 / 2.75) {
+        return 7.5625 * amount * amount;
+      } else if (amount < 2 / 2.75) {
+        return 7.5625 * (amount -= 1.5 / 2.75) * amount + 0.75;
+      } else if (amount < 2.5 / 2.75) {
+        return 7.5625 * (amount -= 2.25 / 2.75) * amount + 0.9375;
+      } else {
+        return 7.5625 * (amount -= 2.625 / 2.75) * amount + 0.984375;
+      }
+    },
+    InOut: function(amount) {
+      if (amount < 0.5) {
+        return Easing.Bounce.In(amount * 2) * 0.5;
+      }
+      return Easing.Bounce.Out(amount * 2 - 1) * 0.5 + 0.5;
+    }
+  }),
+  generatePow: function(power) {
+    if (power === void 0) {
+      power = 4;
+    }
+    power = power < Number.EPSILON ? Number.EPSILON : power;
+    power = power > 1e4 ? 1e4 : power;
+    return {
+      In: function(amount) {
+        return Math.pow(amount, power);
+      },
+      Out: function(amount) {
+        return 1 - Math.pow(1 - amount, power);
+      },
+      InOut: function(amount) {
+        if (amount < 0.5) {
+          return Math.pow(amount * 2, power) / 2;
+        }
+        return (1 - Math.pow(2 - amount * 2, power)) / 2 + 0.5;
+      }
+    };
+  }
+});
+var now = function() {
+  return performance.now();
+};
+var Group = (
+  /** @class */
+  function() {
+    function Group2() {
+      var tweens = [];
+      for (var _i = 0; _i < arguments.length; _i++) {
+        tweens[_i] = arguments[_i];
+      }
+      this._tweens = {};
+      this._tweensAddedDuringUpdate = {};
+      this.add.apply(this, tweens);
+    }
+    Group2.prototype.getAll = function() {
+      var _this = this;
+      return Object.keys(this._tweens).map(function(tweenId) {
+        return _this._tweens[tweenId];
+      });
+    };
+    Group2.prototype.removeAll = function() {
+      this._tweens = {};
+    };
+    Group2.prototype.add = function() {
+      var _a;
+      var tweens = [];
+      for (var _i = 0; _i < arguments.length; _i++) {
+        tweens[_i] = arguments[_i];
+      }
+      for (var _b = 0, tweens_1 = tweens; _b < tweens_1.length; _b++) {
+        var tween = tweens_1[_b];
+        (_a = tween._group) === null || _a === void 0 ? void 0 : _a.remove(tween);
+        tween._group = this;
+        this._tweens[tween.getId()] = tween;
+        this._tweensAddedDuringUpdate[tween.getId()] = tween;
+      }
+    };
+    Group2.prototype.remove = function() {
+      var tweens = [];
+      for (var _i = 0; _i < arguments.length; _i++) {
+        tweens[_i] = arguments[_i];
+      }
+      for (var _a = 0, tweens_2 = tweens; _a < tweens_2.length; _a++) {
+        var tween = tweens_2[_a];
+        tween._group = void 0;
+        delete this._tweens[tween.getId()];
+        delete this._tweensAddedDuringUpdate[tween.getId()];
+      }
+    };
+    Group2.prototype.allStopped = function() {
+      return this.getAll().every(function(tween) {
+        return !tween.isPlaying();
+      });
+    };
+    Group2.prototype.update = function(time, preserve) {
+      if (time === void 0) {
+        time = now();
+      }
+      if (preserve === void 0) {
+        preserve = true;
+      }
+      var tweenIds = Object.keys(this._tweens);
+      if (tweenIds.length === 0)
+        return;
+      while (tweenIds.length > 0) {
+        this._tweensAddedDuringUpdate = {};
+        for (var i = 0; i < tweenIds.length; i++) {
+          var tween = this._tweens[tweenIds[i]];
+          var autoStart = !preserve;
+          if (tween && tween.update(time, autoStart) === false && !preserve)
+            this.remove(tween);
+        }
+        tweenIds = Object.keys(this._tweensAddedDuringUpdate);
+      }
+    };
+    return Group2;
+  }()
+);
+var Interpolation = {
+  Linear: function(v, k) {
+    var m = v.length - 1;
+    var f = m * k;
+    var i = Math.floor(f);
+    var fn = Interpolation.Utils.Linear;
+    if (k < 0) {
+      return fn(v[0], v[1], f);
+    }
+    if (k > 1) {
+      return fn(v[m], v[m - 1], m - f);
+    }
+    return fn(v[i], v[i + 1 > m ? m : i + 1], f - i);
+  },
+  Bezier: function(v, k) {
+    var b = 0;
+    var n = v.length - 1;
+    var pw = Math.pow;
+    var bn = Interpolation.Utils.Bernstein;
+    for (var i = 0; i <= n; i++) {
+      b += pw(1 - k, n - i) * pw(k, i) * v[i] * bn(n, i);
+    }
+    return b;
+  },
+  CatmullRom: function(v, k) {
+    var m = v.length - 1;
+    var f = m * k;
+    var i = Math.floor(f);
+    var fn = Interpolation.Utils.CatmullRom;
+    if (v[0] === v[m]) {
+      if (k < 0) {
+        i = Math.floor(f = m * (1 + k));
+      }
+      return fn(v[(i - 1 + m) % m], v[i], v[(i + 1) % m], v[(i + 2) % m], f - i);
+    } else {
+      if (k < 0) {
+        return v[0] - (fn(v[0], v[0], v[1], v[1], -f) - v[0]);
+      }
+      if (k > 1) {
+        return v[m] - (fn(v[m], v[m], v[m - 1], v[m - 1], f - m) - v[m]);
+      }
+      return fn(v[i ? i - 1 : 0], v[i], v[m < i + 1 ? m : i + 1], v[m < i + 2 ? m : i + 2], f - i);
+    }
+  },
+  Utils: {
+    Linear: function(p0, p1, t) {
+      return (p1 - p0) * t + p0;
+    },
+    Bernstein: function(n, i) {
+      var fc = Interpolation.Utils.Factorial;
+      return fc(n) / fc(i) / fc(n - i);
+    },
+    Factorial: /* @__PURE__ */ function() {
+      var a = [1];
+      return function(n) {
+        var s = 1;
+        if (a[n]) {
+          return a[n];
+        }
+        for (var i = n; i > 1; i--) {
+          s *= i;
+        }
+        a[n] = s;
+        return s;
+      };
+    }(),
+    CatmullRom: function(p0, p1, p2, p3, t) {
+      var v0 = (p2 - p0) * 0.5;
+      var v1 = (p3 - p1) * 0.5;
+      var t2 = t * t;
+      var t3 = t * t2;
+      return (2 * p1 - 2 * p2 + v0 + v1) * t3 + (-3 * p1 + 3 * p2 - 2 * v0 - v1) * t2 + v0 * t + p1;
+    }
+  }
+};
+var Sequence = (
+  /** @class */
+  function() {
+    function Sequence2() {
+    }
+    Sequence2.nextId = function() {
+      return Sequence2._nextId++;
+    };
+    Sequence2._nextId = 0;
+    return Sequence2;
+  }()
+);
+var mainGroup = new Group();
+var Tween = (
+  /** @class */
+  function() {
+    function Tween2(object, group) {
+      this._isPaused = false;
+      this._pauseStart = 0;
+      this._valuesStart = {};
+      this._valuesEnd = {};
+      this._valuesStartRepeat = {};
+      this._duration = 1e3;
+      this._isDynamic = false;
+      this._initialRepeat = 0;
+      this._repeat = 0;
+      this._yoyo = false;
+      this._isPlaying = false;
+      this._reversed = false;
+      this._delayTime = 0;
+      this._startTime = 0;
+      this._easingFunction = Easing.Linear.None;
+      this._interpolationFunction = Interpolation.Linear;
+      this._chainedTweens = [];
+      this._onStartCallbackFired = false;
+      this._onEveryStartCallbackFired = false;
+      this._id = Sequence.nextId();
+      this._isChainStopped = false;
+      this._propertiesAreSetUp = false;
+      this._goToEnd = false;
+      this._object = object;
+      if (typeof group === "object") {
+        this._group = group;
+        group.add(this);
+      } else if (group === true) {
+        this._group = mainGroup;
+        mainGroup.add(this);
+      }
+    }
+    Tween2.prototype.getId = function() {
+      return this._id;
+    };
+    Tween2.prototype.isPlaying = function() {
+      return this._isPlaying;
+    };
+    Tween2.prototype.isPaused = function() {
+      return this._isPaused;
+    };
+    Tween2.prototype.getDuration = function() {
+      return this._duration;
+    };
+    Tween2.prototype.to = function(target, duration) {
+      if (duration === void 0) {
+        duration = 1e3;
+      }
+      if (this._isPlaying)
+        throw new Error("Can not call Tween.to() while Tween is already started or paused. Stop the Tween first.");
+      this._valuesEnd = target;
+      this._propertiesAreSetUp = false;
+      this._duration = duration < 0 ? 0 : duration;
+      return this;
+    };
+    Tween2.prototype.duration = function(duration) {
+      if (duration === void 0) {
+        duration = 1e3;
+      }
+      this._duration = duration < 0 ? 0 : duration;
+      return this;
+    };
+    Tween2.prototype.dynamic = function(dynamic) {
+      if (dynamic === void 0) {
+        dynamic = false;
+      }
+      this._isDynamic = dynamic;
+      return this;
+    };
+    Tween2.prototype.start = function(time, overrideStartingValues) {
+      if (time === void 0) {
+        time = now();
+      }
+      if (overrideStartingValues === void 0) {
+        overrideStartingValues = false;
+      }
+      if (this._isPlaying) {
+        return this;
+      }
+      this._repeat = this._initialRepeat;
+      if (this._reversed) {
+        this._reversed = false;
+        for (var property in this._valuesStartRepeat) {
+          this._swapEndStartRepeatValues(property);
+          this._valuesStart[property] = this._valuesStartRepeat[property];
+        }
+      }
+      this._isPlaying = true;
+      this._isPaused = false;
+      this._onStartCallbackFired = false;
+      this._onEveryStartCallbackFired = false;
+      this._isChainStopped = false;
+      this._startTime = time;
+      this._startTime += this._delayTime;
+      if (!this._propertiesAreSetUp || overrideStartingValues) {
+        this._propertiesAreSetUp = true;
+        if (!this._isDynamic) {
+          var tmp = {};
+          for (var prop in this._valuesEnd)
+            tmp[prop] = this._valuesEnd[prop];
+          this._valuesEnd = tmp;
+        }
+        this._setupProperties(this._object, this._valuesStart, this._valuesEnd, this._valuesStartRepeat, overrideStartingValues);
+      }
+      return this;
+    };
+    Tween2.prototype.startFromCurrentValues = function(time) {
+      return this.start(time, true);
+    };
+    Tween2.prototype._setupProperties = function(_object, _valuesStart, _valuesEnd, _valuesStartRepeat, overrideStartingValues) {
+      for (var property in _valuesEnd) {
+        var startValue = _object[property];
+        var startValueIsArray = Array.isArray(startValue);
+        var propType = startValueIsArray ? "array" : typeof startValue;
+        var isInterpolationList = !startValueIsArray && Array.isArray(_valuesEnd[property]);
+        if (propType === "undefined" || propType === "function") {
+          continue;
+        }
+        if (isInterpolationList) {
+          var endValues = _valuesEnd[property];
+          if (endValues.length === 0) {
+            continue;
+          }
+          var temp = [startValue];
+          for (var i = 0, l = endValues.length; i < l; i += 1) {
+            var value = this._handleRelativeValue(startValue, endValues[i]);
+            if (isNaN(value)) {
+              isInterpolationList = false;
+              console.warn("Found invalid interpolation list. Skipping.");
+              break;
+            }
+            temp.push(value);
+          }
+          if (isInterpolationList) {
+            _valuesEnd[property] = temp;
+          }
+        }
+        if ((propType === "object" || startValueIsArray) && startValue && !isInterpolationList) {
+          _valuesStart[property] = startValueIsArray ? [] : {};
+          var nestedObject = startValue;
+          for (var prop in nestedObject) {
+            _valuesStart[property][prop] = nestedObject[prop];
+          }
+          _valuesStartRepeat[property] = startValueIsArray ? [] : {};
+          var endValues = _valuesEnd[property];
+          if (!this._isDynamic) {
+            var tmp = {};
+            for (var prop in endValues)
+              tmp[prop] = endValues[prop];
+            _valuesEnd[property] = endValues = tmp;
+          }
+          this._setupProperties(nestedObject, _valuesStart[property], endValues, _valuesStartRepeat[property], overrideStartingValues);
+        } else {
+          if (typeof _valuesStart[property] === "undefined" || overrideStartingValues) {
+            _valuesStart[property] = startValue;
+          }
+          if (!startValueIsArray) {
+            _valuesStart[property] *= 1;
+          }
+          if (isInterpolationList) {
+            _valuesStartRepeat[property] = _valuesEnd[property].slice().reverse();
+          } else {
+            _valuesStartRepeat[property] = _valuesStart[property] || 0;
+          }
+        }
+      }
+    };
+    Tween2.prototype.stop = function() {
+      if (!this._isChainStopped) {
+        this._isChainStopped = true;
+        this.stopChainedTweens();
+      }
+      if (!this._isPlaying) {
+        return this;
+      }
+      this._isPlaying = false;
+      this._isPaused = false;
+      if (this._onStopCallback) {
+        this._onStopCallback(this._object);
+      }
+      return this;
+    };
+    Tween2.prototype.end = function() {
+      this._goToEnd = true;
+      this.update(this._startTime + this._duration);
+      return this;
+    };
+    Tween2.prototype.pause = function(time) {
+      if (time === void 0) {
+        time = now();
+      }
+      if (this._isPaused || !this._isPlaying) {
+        return this;
+      }
+      this._isPaused = true;
+      this._pauseStart = time;
+      return this;
+    };
+    Tween2.prototype.resume = function(time) {
+      if (time === void 0) {
+        time = now();
+      }
+      if (!this._isPaused || !this._isPlaying) {
+        return this;
+      }
+      this._isPaused = false;
+      this._startTime += time - this._pauseStart;
+      this._pauseStart = 0;
+      return this;
+    };
+    Tween2.prototype.stopChainedTweens = function() {
+      for (var i = 0, numChainedTweens = this._chainedTweens.length; i < numChainedTweens; i++) {
+        this._chainedTweens[i].stop();
+      }
+      return this;
+    };
+    Tween2.prototype.group = function(group) {
+      if (!group) {
+        console.warn("tween.group() without args has been removed, use group.add(tween) instead.");
+        return this;
+      }
+      group.add(this);
+      return this;
+    };
+    Tween2.prototype.remove = function() {
+      var _a;
+      (_a = this._group) === null || _a === void 0 ? void 0 : _a.remove(this);
+      return this;
+    };
+    Tween2.prototype.delay = function(amount) {
+      if (amount === void 0) {
+        amount = 0;
+      }
+      this._delayTime = amount;
+      return this;
+    };
+    Tween2.prototype.repeat = function(times) {
+      if (times === void 0) {
+        times = 0;
+      }
+      this._initialRepeat = times;
+      this._repeat = times;
+      return this;
+    };
+    Tween2.prototype.repeatDelay = function(amount) {
+      this._repeatDelayTime = amount;
+      return this;
+    };
+    Tween2.prototype.yoyo = function(yoyo) {
+      if (yoyo === void 0) {
+        yoyo = false;
+      }
+      this._yoyo = yoyo;
+      return this;
+    };
+    Tween2.prototype.easing = function(easingFunction) {
+      if (easingFunction === void 0) {
+        easingFunction = Easing.Linear.None;
+      }
+      this._easingFunction = easingFunction;
+      return this;
+    };
+    Tween2.prototype.interpolation = function(interpolationFunction) {
+      if (interpolationFunction === void 0) {
+        interpolationFunction = Interpolation.Linear;
+      }
+      this._interpolationFunction = interpolationFunction;
+      return this;
+    };
+    Tween2.prototype.chain = function() {
+      var tweens = [];
+      for (var _i = 0; _i < arguments.length; _i++) {
+        tweens[_i] = arguments[_i];
+      }
+      this._chainedTweens = tweens;
+      return this;
+    };
+    Tween2.prototype.onStart = function(callback) {
+      this._onStartCallback = callback;
+      return this;
+    };
+    Tween2.prototype.onEveryStart = function(callback) {
+      this._onEveryStartCallback = callback;
+      return this;
+    };
+    Tween2.prototype.onUpdate = function(callback) {
+      this._onUpdateCallback = callback;
+      return this;
+    };
+    Tween2.prototype.onRepeat = function(callback) {
+      this._onRepeatCallback = callback;
+      return this;
+    };
+    Tween2.prototype.onComplete = function(callback) {
+      this._onCompleteCallback = callback;
+      return this;
+    };
+    Tween2.prototype.onStop = function(callback) {
+      this._onStopCallback = callback;
+      return this;
+    };
+    Tween2.prototype.update = function(time, autoStart) {
+      var _this = this;
+      var _a;
+      if (time === void 0) {
+        time = now();
+      }
+      if (autoStart === void 0) {
+        autoStart = Tween2.autoStartOnUpdate;
+      }
+      if (this._isPaused)
+        return true;
+      var property;
+      if (!this._goToEnd && !this._isPlaying) {
+        if (autoStart)
+          this.start(time, true);
+        else
+          return false;
+      }
+      this._goToEnd = false;
+      if (time < this._startTime) {
+        return true;
+      }
+      if (this._onStartCallbackFired === false) {
+        if (this._onStartCallback) {
+          this._onStartCallback(this._object);
+        }
+        this._onStartCallbackFired = true;
+      }
+      if (this._onEveryStartCallbackFired === false) {
+        if (this._onEveryStartCallback) {
+          this._onEveryStartCallback(this._object);
+        }
+        this._onEveryStartCallbackFired = true;
+      }
+      var elapsedTime = time - this._startTime;
+      var durationAndDelay = this._duration + ((_a = this._repeatDelayTime) !== null && _a !== void 0 ? _a : this._delayTime);
+      var totalTime = this._duration + this._repeat * durationAndDelay;
+      var calculateElapsedPortion = function() {
+        if (_this._duration === 0)
+          return 1;
+        if (elapsedTime > totalTime) {
+          return 1;
+        }
+        var timesRepeated = Math.trunc(elapsedTime / durationAndDelay);
+        var timeIntoCurrentRepeat = elapsedTime - timesRepeated * durationAndDelay;
+        var portion = Math.min(timeIntoCurrentRepeat / _this._duration, 1);
+        if (portion === 0 && elapsedTime === _this._duration) {
+          return 1;
+        }
+        return portion;
+      };
+      var elapsed = calculateElapsedPortion();
+      var value = this._easingFunction(elapsed);
+      this._updateProperties(this._object, this._valuesStart, this._valuesEnd, value);
+      if (this._onUpdateCallback) {
+        this._onUpdateCallback(this._object, elapsed);
+      }
+      if (this._duration === 0 || elapsedTime >= this._duration) {
+        if (this._repeat > 0) {
+          var completeCount = Math.min(Math.trunc((elapsedTime - this._duration) / durationAndDelay) + 1, this._repeat);
+          if (isFinite(this._repeat)) {
+            this._repeat -= completeCount;
+          }
+          for (property in this._valuesStartRepeat) {
+            if (!this._yoyo && typeof this._valuesEnd[property] === "string") {
+              this._valuesStartRepeat[property] = // eslint-disable-next-line
+              // @ts-ignore FIXME?
+              this._valuesStartRepeat[property] + parseFloat(this._valuesEnd[property]);
+            }
+            if (this._yoyo) {
+              this._swapEndStartRepeatValues(property);
+            }
+            this._valuesStart[property] = this._valuesStartRepeat[property];
+          }
+          if (this._yoyo) {
+            this._reversed = !this._reversed;
+          }
+          this._startTime += durationAndDelay * completeCount;
+          if (this._onRepeatCallback) {
+            this._onRepeatCallback(this._object);
+          }
+          this._onEveryStartCallbackFired = false;
+          return true;
+        } else {
+          if (this._onCompleteCallback) {
+            this._onCompleteCallback(this._object);
+          }
+          for (var i = 0, numChainedTweens = this._chainedTweens.length; i < numChainedTweens; i++) {
+            this._chainedTweens[i].start(this._startTime + this._duration, false);
+          }
+          this._isPlaying = false;
+          return false;
+        }
+      }
+      return true;
+    };
+    Tween2.prototype._updateProperties = function(_object, _valuesStart, _valuesEnd, value) {
+      for (var property in _valuesEnd) {
+        if (_valuesStart[property] === void 0) {
+          continue;
+        }
+        var start = _valuesStart[property] || 0;
+        var end = _valuesEnd[property];
+        var startIsArray = Array.isArray(_object[property]);
+        var endIsArray = Array.isArray(end);
+        var isInterpolationList = !startIsArray && endIsArray;
+        if (isInterpolationList) {
+          _object[property] = this._interpolationFunction(end, value);
+        } else if (typeof end === "object" && end) {
+          this._updateProperties(_object[property], start, end, value);
+        } else {
+          end = this._handleRelativeValue(start, end);
+          if (typeof end === "number") {
+            _object[property] = start + (end - start) * value;
+          }
+        }
+      }
+    };
+    Tween2.prototype._handleRelativeValue = function(start, end) {
+      if (typeof end !== "string") {
+        return end;
+      }
+      if (end.charAt(0) === "+" || end.charAt(0) === "-") {
+        return start + parseFloat(end);
+      }
+      return parseFloat(end);
+    };
+    Tween2.prototype._swapEndStartRepeatValues = function(property) {
+      var tmp = this._valuesStartRepeat[property];
+      var endValue = this._valuesEnd[property];
+      if (typeof endValue === "string") {
+        this._valuesStartRepeat[property] = this._valuesStartRepeat[property] + parseFloat(endValue);
+      } else {
+        this._valuesStartRepeat[property] = this._valuesEnd[property];
+      }
+      this._valuesEnd[property] = tmp;
+    };
+    Tween2.autoStartOnUpdate = false;
+    return Tween2;
+  }()
+);
+var TWEEN = mainGroup;
+TWEEN.getAll.bind(TWEEN);
+TWEEN.removeAll.bind(TWEEN);
+TWEEN.add.bind(TWEEN);
+TWEEN.remove.bind(TWEEN);
+TWEEN.update.bind(TWEEN);
+const _changeEvent = { type: "change" };
+const _startEvent = { type: "start" };
+const _endEvent = { type: "end" };
+const _ray = new Ray();
+const _plane = new Plane();
+const _TILT_LIMIT = Math.cos(70 * MathUtils.DEG2RAD);
+const _v = new Vector3();
+const _twoPI = 2 * Math.PI;
+const _STATE = {
+  NONE: -1,
+  ROTATE: 0,
+  DOLLY: 1,
+  PAN: 2,
+  TOUCH_ROTATE: 3,
+  TOUCH_PAN: 4,
+  TOUCH_DOLLY_PAN: 5,
+  TOUCH_DOLLY_ROTATE: 6
+};
+const _EPS = 1e-6;
+class OrbitControls extends Controls {
+  constructor(object, domElement = null) {
+    super(object, domElement);
+    this.state = _STATE.NONE;
+    this.enabled = true;
+    this.target = new Vector3();
+    this.cursor = new Vector3();
+    this.minDistance = 0;
+    this.maxDistance = Infinity;
+    this.minZoom = 0;
+    this.maxZoom = Infinity;
+    this.minTargetRadius = 0;
+    this.maxTargetRadius = Infinity;
+    this.minPolarAngle = 0;
+    this.maxPolarAngle = Math.PI;
+    this.minAzimuthAngle = -Infinity;
+    this.maxAzimuthAngle = Infinity;
+    this.enableDamping = false;
+    this.dampingFactor = 0.05;
+    this.enableZoom = true;
+    this.zoomSpeed = 1;
+    this.enableRotate = true;
+    this.rotateSpeed = 1;
+    this.enablePan = true;
+    this.panSpeed = 1;
+    this.screenSpacePanning = true;
+    this.keyPanSpeed = 7;
+    this.zoomToCursor = false;
+    this.autoRotate = false;
+    this.autoRotateSpeed = 2;
+    this.keys = { LEFT: "ArrowLeft", UP: "ArrowUp", RIGHT: "ArrowRight", BOTTOM: "ArrowDown" };
+    this.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN };
+    this.touches = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN };
+    this.target0 = this.target.clone();
+    this.position0 = this.object.position.clone();
+    this.zoom0 = this.object.zoom;
+    this._domElementKeyEvents = null;
+    this._lastPosition = new Vector3();
+    this._lastQuaternion = new Quaternion();
+    this._lastTargetPosition = new Vector3();
+    this._quat = new Quaternion().setFromUnitVectors(object.up, new Vector3(0, 1, 0));
+    this._quatInverse = this._quat.clone().invert();
+    this._spherical = new Spherical();
+    this._sphericalDelta = new Spherical();
+    this._scale = 1;
+    this._panOffset = new Vector3();
+    this._rotateStart = new Vector2();
+    this._rotateEnd = new Vector2();
+    this._rotateDelta = new Vector2();
+    this._panStart = new Vector2();
+    this._panEnd = new Vector2();
+    this._panDelta = new Vector2();
+    this._dollyStart = new Vector2();
+    this._dollyEnd = new Vector2();
+    this._dollyDelta = new Vector2();
+    this._dollyDirection = new Vector3();
+    this._mouse = new Vector2();
+    this._performCursorZoom = false;
+    this._pointers = [];
+    this._pointerPositions = {};
+    this._controlActive = false;
+    this._onPointerMove = onPointerMove.bind(this);
+    this._onPointerDown = onPointerDown.bind(this);
+    this._onPointerUp = onPointerUp.bind(this);
+    this._onContextMenu = onContextMenu.bind(this);
+    this._onMouseWheel = onMouseWheel.bind(this);
+    this._onKeyDown = onKeyDown.bind(this);
+    this._onTouchStart = onTouchStart.bind(this);
+    this._onTouchMove = onTouchMove.bind(this);
+    this._onMouseDown = onMouseDown.bind(this);
+    this._onMouseMove = onMouseMove.bind(this);
+    this._interceptControlDown = interceptControlDown.bind(this);
+    this._interceptControlUp = interceptControlUp.bind(this);
+    if (this.domElement !== null) {
+      this.connect();
+    }
+    this.update();
+  }
+  connect() {
+    this.domElement.addEventListener("pointerdown", this._onPointerDown);
+    this.domElement.addEventListener("pointercancel", this._onPointerUp);
+    this.domElement.addEventListener("contextmenu", this._onContextMenu);
+    this.domElement.addEventListener("wheel", this._onMouseWheel, { passive: false });
+    const document2 = this.domElement.getRootNode();
+    document2.addEventListener("keydown", this._interceptControlDown, { passive: true, capture: true });
+    this.domElement.style.touchAction = "none";
+  }
+  disconnect() {
+    this.domElement.removeEventListener("pointerdown", this._onPointerDown);
+    this.domElement.removeEventListener("pointermove", this._onPointerMove);
+    this.domElement.removeEventListener("pointerup", this._onPointerUp);
+    this.domElement.removeEventListener("pointercancel", this._onPointerUp);
+    this.domElement.removeEventListener("wheel", this._onMouseWheel);
+    this.domElement.removeEventListener("contextmenu", this._onContextMenu);
+    this.stopListenToKeyEvents();
+    const document2 = this.domElement.getRootNode();
+    document2.removeEventListener("keydown", this._interceptControlDown, { capture: true });
+    this.domElement.style.touchAction = "auto";
+  }
+  dispose() {
+    this.disconnect();
+  }
+  getPolarAngle() {
+    return this._spherical.phi;
+  }
+  getAzimuthalAngle() {
+    return this._spherical.theta;
+  }
+  getDistance() {
+    return this.object.position.distanceTo(this.target);
+  }
+  listenToKeyEvents(domElement) {
+    domElement.addEventListener("keydown", this._onKeyDown);
+    this._domElementKeyEvents = domElement;
+  }
+  stopListenToKeyEvents() {
+    if (this._domElementKeyEvents !== null) {
+      this._domElementKeyEvents.removeEventListener("keydown", this._onKeyDown);
+      this._domElementKeyEvents = null;
+    }
+  }
+  saveState() {
+    this.target0.copy(this.target);
+    this.position0.copy(this.object.position);
+    this.zoom0 = this.object.zoom;
+  }
+  reset() {
+    this.target.copy(this.target0);
+    this.object.position.copy(this.position0);
+    this.object.zoom = this.zoom0;
+    this.object.updateProjectionMatrix();
+    this.dispatchEvent(_changeEvent);
+    this.update();
+    this.state = _STATE.NONE;
+  }
+  update(deltaTime = null) {
+    const position = this.object.position;
+    _v.copy(position).sub(this.target);
+    _v.applyQuaternion(this._quat);
+    this._spherical.setFromVector3(_v);
+    if (this.autoRotate && this.state === _STATE.NONE) {
+      this._rotateLeft(this._getAutoRotationAngle(deltaTime));
+    }
+    if (this.enableDamping) {
+      this._spherical.theta += this._sphericalDelta.theta * this.dampingFactor;
+      this._spherical.phi += this._sphericalDelta.phi * this.dampingFactor;
+    } else {
+      this._spherical.theta += this._sphericalDelta.theta;
+      this._spherical.phi += this._sphericalDelta.phi;
+    }
+    let min = this.minAzimuthAngle;
+    let max = this.maxAzimuthAngle;
+    if (isFinite(min) && isFinite(max)) {
+      if (min < -Math.PI) min += _twoPI;
+      else if (min > Math.PI) min -= _twoPI;
+      if (max < -Math.PI) max += _twoPI;
+      else if (max > Math.PI) max -= _twoPI;
+      if (min <= max) {
+        this._spherical.theta = Math.max(min, Math.min(max, this._spherical.theta));
+      } else {
+        this._spherical.theta = this._spherical.theta > (min + max) / 2 ? Math.max(min, this._spherical.theta) : Math.min(max, this._spherical.theta);
+      }
+    }
+    this._spherical.phi = Math.max(this.minPolarAngle, Math.min(this.maxPolarAngle, this._spherical.phi));
+    this._spherical.makeSafe();
+    if (this.enableDamping === true) {
+      this.target.addScaledVector(this._panOffset, this.dampingFactor);
+    } else {
+      this.target.add(this._panOffset);
+    }
+    this.target.sub(this.cursor);
+    this.target.clampLength(this.minTargetRadius, this.maxTargetRadius);
+    this.target.add(this.cursor);
+    let zoomChanged = false;
+    if (this.zoomToCursor && this._performCursorZoom || this.object.isOrthographicCamera) {
+      this._spherical.radius = this._clampDistance(this._spherical.radius);
+    } else {
+      const prevRadius = this._spherical.radius;
+      this._spherical.radius = this._clampDistance(this._spherical.radius * this._scale);
+      zoomChanged = prevRadius != this._spherical.radius;
+    }
+    _v.setFromSpherical(this._spherical);
+    _v.applyQuaternion(this._quatInverse);
+    position.copy(this.target).add(_v);
+    this.object.lookAt(this.target);
+    if (this.enableDamping === true) {
+      this._sphericalDelta.theta *= 1 - this.dampingFactor;
+      this._sphericalDelta.phi *= 1 - this.dampingFactor;
+      this._panOffset.multiplyScalar(1 - this.dampingFactor);
+    } else {
+      this._sphericalDelta.set(0, 0, 0);
+      this._panOffset.set(0, 0, 0);
+    }
+    if (this.zoomToCursor && this._performCursorZoom) {
+      let newRadius = null;
+      if (this.object.isPerspectiveCamera) {
+        const prevRadius = _v.length();
+        newRadius = this._clampDistance(prevRadius * this._scale);
+        const radiusDelta = prevRadius - newRadius;
+        this.object.position.addScaledVector(this._dollyDirection, radiusDelta);
+        this.object.updateMatrixWorld();
+        zoomChanged = !!radiusDelta;
+      } else if (this.object.isOrthographicCamera) {
+        const mouseBefore = new Vector3(this._mouse.x, this._mouse.y, 0);
+        mouseBefore.unproject(this.object);
+        const prevZoom = this.object.zoom;
+        this.object.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.object.zoom / this._scale));
+        this.object.updateProjectionMatrix();
+        zoomChanged = prevZoom !== this.object.zoom;
+        const mouseAfter = new Vector3(this._mouse.x, this._mouse.y, 0);
+        mouseAfter.unproject(this.object);
+        this.object.position.sub(mouseAfter).add(mouseBefore);
+        this.object.updateMatrixWorld();
+        newRadius = _v.length();
+      } else {
+        console.warn("WARNING: OrbitControls.js encountered an unknown camera type - zoom to cursor disabled.");
+        this.zoomToCursor = false;
+      }
+      if (newRadius !== null) {
+        if (this.screenSpacePanning) {
+          this.target.set(0, 0, -1).transformDirection(this.object.matrix).multiplyScalar(newRadius).add(this.object.position);
+        } else {
+          _ray.origin.copy(this.object.position);
+          _ray.direction.set(0, 0, -1).transformDirection(this.object.matrix);
+          if (Math.abs(this.object.up.dot(_ray.direction)) < _TILT_LIMIT) {
+            this.object.lookAt(this.target);
+          } else {
+            _plane.setFromNormalAndCoplanarPoint(this.object.up, this.target);
+            _ray.intersectPlane(_plane, this.target);
+          }
+        }
+      }
+    } else if (this.object.isOrthographicCamera) {
+      const prevZoom = this.object.zoom;
+      this.object.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.object.zoom / this._scale));
+      if (prevZoom !== this.object.zoom) {
+        this.object.updateProjectionMatrix();
+        zoomChanged = true;
+      }
+    }
+    this._scale = 1;
+    this._performCursorZoom = false;
+    if (zoomChanged || this._lastPosition.distanceToSquared(this.object.position) > _EPS || 8 * (1 - this._lastQuaternion.dot(this.object.quaternion)) > _EPS || this._lastTargetPosition.distanceToSquared(this.target) > _EPS) {
+      this.dispatchEvent(_changeEvent);
+      this._lastPosition.copy(this.object.position);
+      this._lastQuaternion.copy(this.object.quaternion);
+      this._lastTargetPosition.copy(this.target);
+      return true;
+    }
+    return false;
+  }
+  _getAutoRotationAngle(deltaTime) {
+    if (deltaTime !== null) {
+      return _twoPI / 60 * this.autoRotateSpeed * deltaTime;
+    } else {
+      return _twoPI / 60 / 60 * this.autoRotateSpeed;
+    }
+  }
+  _getZoomScale(delta) {
+    const normalizedDelta = Math.abs(delta * 0.01);
+    return Math.pow(0.95, this.zoomSpeed * normalizedDelta);
+  }
+  _rotateLeft(angle) {
+    this._sphericalDelta.theta -= angle;
+  }
+  _rotateUp(angle) {
+    this._sphericalDelta.phi -= angle;
+  }
+  _panLeft(distance, objectMatrix) {
+    _v.setFromMatrixColumn(objectMatrix, 0);
+    _v.multiplyScalar(-distance);
+    this._panOffset.add(_v);
+  }
+  _panUp(distance, objectMatrix) {
+    if (this.screenSpacePanning === true) {
+      _v.setFromMatrixColumn(objectMatrix, 1);
+    } else {
+      _v.setFromMatrixColumn(objectMatrix, 0);
+      _v.crossVectors(this.object.up, _v);
+    }
+    _v.multiplyScalar(distance);
+    this._panOffset.add(_v);
+  }
+  // deltaX and deltaY are in pixels; right and down are positive
+  _pan(deltaX, deltaY) {
+    const element = this.domElement;
+    if (this.object.isPerspectiveCamera) {
+      const position = this.object.position;
+      _v.copy(position).sub(this.target);
+      let targetDistance = _v.length();
+      targetDistance *= Math.tan(this.object.fov / 2 * Math.PI / 180);
+      this._panLeft(2 * deltaX * targetDistance / element.clientHeight, this.object.matrix);
+      this._panUp(2 * deltaY * targetDistance / element.clientHeight, this.object.matrix);
+    } else if (this.object.isOrthographicCamera) {
+      this._panLeft(deltaX * (this.object.right - this.object.left) / this.object.zoom / element.clientWidth, this.object.matrix);
+      this._panUp(deltaY * (this.object.top - this.object.bottom) / this.object.zoom / element.clientHeight, this.object.matrix);
+    } else {
+      console.warn("WARNING: OrbitControls.js encountered an unknown camera type - pan disabled.");
+      this.enablePan = false;
+    }
+  }
+  _dollyOut(dollyScale) {
+    if (this.object.isPerspectiveCamera || this.object.isOrthographicCamera) {
+      this._scale /= dollyScale;
+    } else {
+      console.warn("WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.");
+      this.enableZoom = false;
+    }
+  }
+  _dollyIn(dollyScale) {
+    if (this.object.isPerspectiveCamera || this.object.isOrthographicCamera) {
+      this._scale *= dollyScale;
+    } else {
+      console.warn("WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.");
+      this.enableZoom = false;
+    }
+  }
+  _updateZoomParameters(x, y) {
+    if (!this.zoomToCursor) {
+      return;
+    }
+    this._performCursorZoom = true;
+    const rect = this.domElement.getBoundingClientRect();
+    const dx = x - rect.left;
+    const dy = y - rect.top;
+    const w = rect.width;
+    const h = rect.height;
+    this._mouse.x = dx / w * 2 - 1;
+    this._mouse.y = -(dy / h) * 2 + 1;
+    this._dollyDirection.set(this._mouse.x, this._mouse.y, 1).unproject(this.object).sub(this.object.position).normalize();
+  }
+  _clampDistance(dist) {
+    return Math.max(this.minDistance, Math.min(this.maxDistance, dist));
+  }
+  //
+  // event callbacks - update the object state
+  //
+  _handleMouseDownRotate(event) {
+    this._rotateStart.set(event.clientX, event.clientY);
+  }
+  _handleMouseDownDolly(event) {
+    this._updateZoomParameters(event.clientX, event.clientX);
+    this._dollyStart.set(event.clientX, event.clientY);
+  }
+  _handleMouseDownPan(event) {
+    this._panStart.set(event.clientX, event.clientY);
+  }
+  _handleMouseMoveRotate(event) {
+    this._rotateEnd.set(event.clientX, event.clientY);
+    this._rotateDelta.subVectors(this._rotateEnd, this._rotateStart).multiplyScalar(this.rotateSpeed);
+    const element = this.domElement;
+    this._rotateLeft(_twoPI * this._rotateDelta.x / element.clientHeight);
+    this._rotateUp(_twoPI * this._rotateDelta.y / element.clientHeight);
+    this._rotateStart.copy(this._rotateEnd);
+    this.update();
+  }
+  _handleMouseMoveDolly(event) {
+    this._dollyEnd.set(event.clientX, event.clientY);
+    this._dollyDelta.subVectors(this._dollyEnd, this._dollyStart);
+    if (this._dollyDelta.y > 0) {
+      this._dollyOut(this._getZoomScale(this._dollyDelta.y));
+    } else if (this._dollyDelta.y < 0) {
+      this._dollyIn(this._getZoomScale(this._dollyDelta.y));
+    }
+    this._dollyStart.copy(this._dollyEnd);
+    this.update();
+  }
+  _handleMouseMovePan(event) {
+    this._panEnd.set(event.clientX, event.clientY);
+    this._panDelta.subVectors(this._panEnd, this._panStart).multiplyScalar(this.panSpeed);
+    this._pan(this._panDelta.x, this._panDelta.y);
+    this._panStart.copy(this._panEnd);
+    this.update();
+  }
+  _handleMouseWheel(event) {
+    this._updateZoomParameters(event.clientX, event.clientY);
+    if (event.deltaY < 0) {
+      this._dollyIn(this._getZoomScale(event.deltaY));
+    } else if (event.deltaY > 0) {
+      this._dollyOut(this._getZoomScale(event.deltaY));
+    }
+    this.update();
+  }
+  _handleKeyDown(event) {
+    let needsUpdate = false;
+    switch (event.code) {
+      case this.keys.UP:
+        if (event.ctrlKey || event.metaKey || event.shiftKey) {
+          this._rotateUp(_twoPI * this.rotateSpeed / this.domElement.clientHeight);
+        } else {
+          this._pan(0, this.keyPanSpeed);
+        }
+        needsUpdate = true;
+        break;
+      case this.keys.BOTTOM:
+        if (event.ctrlKey || event.metaKey || event.shiftKey) {
+          this._rotateUp(-_twoPI * this.rotateSpeed / this.domElement.clientHeight);
+        } else {
+          this._pan(0, -this.keyPanSpeed);
+        }
+        needsUpdate = true;
+        break;
+      case this.keys.LEFT:
+        if (event.ctrlKey || event.metaKey || event.shiftKey) {
+          this._rotateLeft(_twoPI * this.rotateSpeed / this.domElement.clientHeight);
+        } else {
+          this._pan(this.keyPanSpeed, 0);
+        }
+        needsUpdate = true;
+        break;
+      case this.keys.RIGHT:
+        if (event.ctrlKey || event.metaKey || event.shiftKey) {
+          this._rotateLeft(-_twoPI * this.rotateSpeed / this.domElement.clientHeight);
+        } else {
+          this._pan(-this.keyPanSpeed, 0);
+        }
+        needsUpdate = true;
+        break;
+    }
+    if (needsUpdate) {
+      event.preventDefault();
+      this.update();
+    }
+  }
+  _handleTouchStartRotate(event) {
+    if (this._pointers.length === 1) {
+      this._rotateStart.set(event.pageX, event.pageY);
+    } else {
+      const position = this._getSecondPointerPosition(event);
+      const x = 0.5 * (event.pageX + position.x);
+      const y = 0.5 * (event.pageY + position.y);
+      this._rotateStart.set(x, y);
+    }
+  }
+  _handleTouchStartPan(event) {
+    if (this._pointers.length === 1) {
+      this._panStart.set(event.pageX, event.pageY);
+    } else {
+      const position = this._getSecondPointerPosition(event);
+      const x = 0.5 * (event.pageX + position.x);
+      const y = 0.5 * (event.pageY + position.y);
+      this._panStart.set(x, y);
+    }
+  }
+  _handleTouchStartDolly(event) {
+    const position = this._getSecondPointerPosition(event);
+    const dx = event.pageX - position.x;
+    const dy = event.pageY - position.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    this._dollyStart.set(0, distance);
+  }
+  _handleTouchStartDollyPan(event) {
+    if (this.enableZoom) this._handleTouchStartDolly(event);
+    if (this.enablePan) this._handleTouchStartPan(event);
+  }
+  _handleTouchStartDollyRotate(event) {
+    if (this.enableZoom) this._handleTouchStartDolly(event);
+    if (this.enableRotate) this._handleTouchStartRotate(event);
+  }
+  _handleTouchMoveRotate(event) {
+    if (this._pointers.length == 1) {
+      this._rotateEnd.set(event.pageX, event.pageY);
+    } else {
+      const position = this._getSecondPointerPosition(event);
+      const x = 0.5 * (event.pageX + position.x);
+      const y = 0.5 * (event.pageY + position.y);
+      this._rotateEnd.set(x, y);
+    }
+    this._rotateDelta.subVectors(this._rotateEnd, this._rotateStart).multiplyScalar(this.rotateSpeed);
+    const element = this.domElement;
+    this._rotateLeft(_twoPI * this._rotateDelta.x / element.clientHeight);
+    this._rotateUp(_twoPI * this._rotateDelta.y / element.clientHeight);
+    this._rotateStart.copy(this._rotateEnd);
+  }
+  _handleTouchMovePan(event) {
+    if (this._pointers.length === 1) {
+      this._panEnd.set(event.pageX, event.pageY);
+    } else {
+      const position = this._getSecondPointerPosition(event);
+      const x = 0.5 * (event.pageX + position.x);
+      const y = 0.5 * (event.pageY + position.y);
+      this._panEnd.set(x, y);
+    }
+    this._panDelta.subVectors(this._panEnd, this._panStart).multiplyScalar(this.panSpeed);
+    this._pan(this._panDelta.x, this._panDelta.y);
+    this._panStart.copy(this._panEnd);
+  }
+  _handleTouchMoveDolly(event) {
+    const position = this._getSecondPointerPosition(event);
+    const dx = event.pageX - position.x;
+    const dy = event.pageY - position.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    this._dollyEnd.set(0, distance);
+    this._dollyDelta.set(0, Math.pow(this._dollyEnd.y / this._dollyStart.y, this.zoomSpeed));
+    this._dollyOut(this._dollyDelta.y);
+    this._dollyStart.copy(this._dollyEnd);
+    const centerX = (event.pageX + position.x) * 0.5;
+    const centerY = (event.pageY + position.y) * 0.5;
+    this._updateZoomParameters(centerX, centerY);
+  }
+  _handleTouchMoveDollyPan(event) {
+    if (this.enableZoom) this._handleTouchMoveDolly(event);
+    if (this.enablePan) this._handleTouchMovePan(event);
+  }
+  _handleTouchMoveDollyRotate(event) {
+    if (this.enableZoom) this._handleTouchMoveDolly(event);
+    if (this.enableRotate) this._handleTouchMoveRotate(event);
+  }
+  // pointers
+  _addPointer(event) {
+    this._pointers.push(event.pointerId);
+  }
+  _removePointer(event) {
+    delete this._pointerPositions[event.pointerId];
+    for (let i = 0; i < this._pointers.length; i++) {
+      if (this._pointers[i] == event.pointerId) {
+        this._pointers.splice(i, 1);
+        return;
+      }
+    }
+  }
+  _isTrackingPointer(event) {
+    for (let i = 0; i < this._pointers.length; i++) {
+      if (this._pointers[i] == event.pointerId) return true;
+    }
+    return false;
+  }
+  _trackPointer(event) {
+    let position = this._pointerPositions[event.pointerId];
+    if (position === void 0) {
+      position = new Vector2();
+      this._pointerPositions[event.pointerId] = position;
+    }
+    position.set(event.pageX, event.pageY);
+  }
+  _getSecondPointerPosition(event) {
+    const pointerId = event.pointerId === this._pointers[0] ? this._pointers[1] : this._pointers[0];
+    return this._pointerPositions[pointerId];
+  }
+  //
+  _customWheelEvent(event) {
+    const mode = event.deltaMode;
+    const newEvent = {
+      clientX: event.clientX,
+      clientY: event.clientY,
+      deltaY: event.deltaY
+    };
+    switch (mode) {
+      case 1:
+        newEvent.deltaY *= 16;
+        break;
+      case 2:
+        newEvent.deltaY *= 100;
+        break;
+    }
+    if (event.ctrlKey && !this._controlActive) {
+      newEvent.deltaY *= 10;
+    }
+    return newEvent;
+  }
+}
+function onPointerDown(event) {
+  if (this.enabled === false) return;
+  if (this._pointers.length === 0) {
+    this.domElement.setPointerCapture(event.pointerId);
+    this.domElement.addEventListener("pointermove", this._onPointerMove);
+    this.domElement.addEventListener("pointerup", this._onPointerUp);
+  }
+  if (this._isTrackingPointer(event)) return;
+  this._addPointer(event);
+  if (event.pointerType === "touch") {
+    this._onTouchStart(event);
+  } else {
+    this._onMouseDown(event);
+  }
+}
+function onPointerMove(event) {
+  if (this.enabled === false) return;
+  if (event.pointerType === "touch") {
+    this._onTouchMove(event);
+  } else {
+    this._onMouseMove(event);
+  }
+}
+function onPointerUp(event) {
+  this._removePointer(event);
+  switch (this._pointers.length) {
+    case 0:
+      this.domElement.releasePointerCapture(event.pointerId);
+      this.domElement.removeEventListener("pointermove", this._onPointerMove);
+      this.domElement.removeEventListener("pointerup", this._onPointerUp);
+      this.dispatchEvent(_endEvent);
+      this.state = _STATE.NONE;
+      break;
+    case 1:
+      const pointerId = this._pointers[0];
+      const position = this._pointerPositions[pointerId];
+      this._onTouchStart({ pointerId, pageX: position.x, pageY: position.y });
+      break;
+  }
+}
+function onMouseDown(event) {
+  let mouseAction;
+  switch (event.button) {
+    case 0:
+      mouseAction = this.mouseButtons.LEFT;
+      break;
+    case 1:
+      mouseAction = this.mouseButtons.MIDDLE;
+      break;
+    case 2:
+      mouseAction = this.mouseButtons.RIGHT;
+      break;
+    default:
+      mouseAction = -1;
+  }
+  switch (mouseAction) {
+    case MOUSE.DOLLY:
+      if (this.enableZoom === false) return;
+      this._handleMouseDownDolly(event);
+      this.state = _STATE.DOLLY;
+      break;
+    case MOUSE.ROTATE:
+      if (event.ctrlKey || event.metaKey || event.shiftKey) {
+        if (this.enablePan === false) return;
+        this._handleMouseDownPan(event);
+        this.state = _STATE.PAN;
+      } else {
+        if (this.enableRotate === false) return;
+        this._handleMouseDownRotate(event);
+        this.state = _STATE.ROTATE;
+      }
+      break;
+    case MOUSE.PAN:
+      if (event.ctrlKey || event.metaKey || event.shiftKey) {
+        if (this.enableRotate === false) return;
+        this._handleMouseDownRotate(event);
+        this.state = _STATE.ROTATE;
+      } else {
+        if (this.enablePan === false) return;
+        this._handleMouseDownPan(event);
+        this.state = _STATE.PAN;
+      }
+      break;
+    default:
+      this.state = _STATE.NONE;
+  }
+  if (this.state !== _STATE.NONE) {
+    this.dispatchEvent(_startEvent);
+  }
+}
+function onMouseMove(event) {
+  switch (this.state) {
+    case _STATE.ROTATE:
+      if (this.enableRotate === false) return;
+      this._handleMouseMoveRotate(event);
+      break;
+    case _STATE.DOLLY:
+      if (this.enableZoom === false) return;
+      this._handleMouseMoveDolly(event);
+      break;
+    case _STATE.PAN:
+      if (this.enablePan === false) return;
+      this._handleMouseMovePan(event);
+      break;
+  }
+}
+function onMouseWheel(event) {
+  if (this.enabled === false || this.enableZoom === false || this.state !== _STATE.NONE) return;
+  event.preventDefault();
+  this.dispatchEvent(_startEvent);
+  this._handleMouseWheel(this._customWheelEvent(event));
+  this.dispatchEvent(_endEvent);
+}
+function onKeyDown(event) {
+  if (this.enabled === false || this.enablePan === false) return;
+  this._handleKeyDown(event);
+}
+function onTouchStart(event) {
+  this._trackPointer(event);
+  switch (this._pointers.length) {
+    case 1:
+      switch (this.touches.ONE) {
+        case TOUCH.ROTATE:
+          if (this.enableRotate === false) return;
+          this._handleTouchStartRotate(event);
+          this.state = _STATE.TOUCH_ROTATE;
+          break;
+        case TOUCH.PAN:
+          if (this.enablePan === false) return;
+          this._handleTouchStartPan(event);
+          this.state = _STATE.TOUCH_PAN;
+          break;
+        default:
+          this.state = _STATE.NONE;
+      }
+      break;
+    case 2:
+      switch (this.touches.TWO) {
+        case TOUCH.DOLLY_PAN:
+          if (this.enableZoom === false && this.enablePan === false) return;
+          this._handleTouchStartDollyPan(event);
+          this.state = _STATE.TOUCH_DOLLY_PAN;
+          break;
+        case TOUCH.DOLLY_ROTATE:
+          if (this.enableZoom === false && this.enableRotate === false) return;
+          this._handleTouchStartDollyRotate(event);
+          this.state = _STATE.TOUCH_DOLLY_ROTATE;
+          break;
+        default:
+          this.state = _STATE.NONE;
+      }
+      break;
+    default:
+      this.state = _STATE.NONE;
+  }
+  if (this.state !== _STATE.NONE) {
+    this.dispatchEvent(_startEvent);
+  }
+}
+function onTouchMove(event) {
+  this._trackPointer(event);
+  switch (this.state) {
+    case _STATE.TOUCH_ROTATE:
+      if (this.enableRotate === false) return;
+      this._handleTouchMoveRotate(event);
+      this.update();
+      break;
+    case _STATE.TOUCH_PAN:
+      if (this.enablePan === false) return;
+      this._handleTouchMovePan(event);
+      this.update();
+      break;
+    case _STATE.TOUCH_DOLLY_PAN:
+      if (this.enableZoom === false && this.enablePan === false) return;
+      this._handleTouchMoveDollyPan(event);
+      this.update();
+      break;
+    case _STATE.TOUCH_DOLLY_ROTATE:
+      if (this.enableZoom === false && this.enableRotate === false) return;
+      this._handleTouchMoveDollyRotate(event);
+      this.update();
+      break;
+    default:
+      this.state = _STATE.NONE;
+  }
+}
+function onContextMenu(event) {
+  if (this.enabled === false) return;
+  event.preventDefault();
+}
+function interceptControlDown(event) {
+  if (event.key === "Control") {
+    this._controlActive = true;
+    const document2 = this.domElement.getRootNode();
+    document2.addEventListener("keyup", this._interceptControlUp, { passive: true, capture: true });
+  }
+}
+function interceptControlUp(event) {
+  if (event.key === "Control") {
+    this._controlActive = false;
+    const document2 = this.domElement.getRootNode();
+    document2.removeEventListener("keyup", this._interceptControlUp, { passive: true, capture: true });
+  }
+}
+const CopyShader = {
+  name: "CopyShader",
+  uniforms: {
+    "tDiffuse": { value: null },
+    "opacity": { value: 1 }
+  },
+  vertexShader: (
+    /* glsl */
+    `
 
 		varying vec2 vUv;
 
@@ -7,7 +1667,11 @@ import*as u from"three";import{Ray as Et,Plane as xt,MathUtils as Dt,Vector3 as 
 			vUv = uv;
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		}`,fragmentShader:`
+		}`
+  ),
+  fragmentShader: (
+    /* glsl */
+    `
 
 		uniform float opacity;
 
@@ -21,7 +1685,326 @@ import*as u from"three";import{Ray as Et,Plane as xt,MathUtils as Dt,Vector3 as 
 			gl_FragColor = opacity * texel;
 
 
-		}`};class B{constructor(){this.isPass=!0,this.enabled=!0,this.needsSwap=!0,this.clear=!1,this.renderToScreen=!1}setSize(){}render(){console.error("THREE.Pass: .render() must be implemented in derived pass.")}dispose(){}}const he=new Ot(-1,1,1,-1,0,1);class le extends Lt{constructor(){super(),this.setAttribute("position",new ct([-1,3,0,-1,-1,0,3,-1,0],3)),this.setAttribute("uv",new ct([0,2,0,0,2,0],2))}}const ce=new le;class at{constructor(t){this._mesh=new At(ce,t)}dispose(){this._mesh.geometry.dispose()}render(t){t.render(this._mesh,he)}get material(){return this._mesh.material}set material(t){this._mesh.material=t}}class ue extends B{constructor(t,i){super(),this.textureID=i!==void 0?i:"tDiffuse",t instanceof k?(this.uniforms=t.uniforms,this.material=t):t&&(this.uniforms=tt.clone(t.uniforms),this.material=new k({name:t.name!==void 0?t.name:"unspecified",defines:Object.assign({},t.defines),uniforms:this.uniforms,vertexShader:t.vertexShader,fragmentShader:t.fragmentShader})),this.fsQuad=new at(this.material)}render(t,i,s){this.uniforms[this.textureID]&&(this.uniforms[this.textureID].value=s.texture),this.fsQuad.material=this.material,this.renderToScreen?(t.setRenderTarget(null),this.fsQuad.render(t)):(t.setRenderTarget(i),this.clear&&t.clear(t.autoClearColor,t.autoClearDepth,t.autoClearStencil),this.fsQuad.render(t))}dispose(){this.material.dispose(),this.fsQuad.dispose()}}class dt extends B{constructor(t,i){super(),this.scene=t,this.camera=i,this.clear=!0,this.needsSwap=!1,this.inverse=!1}render(t,i,s){const o=t.getContext(),r=t.state;r.buffers.color.setMask(!1),r.buffers.depth.setMask(!1),r.buffers.color.setLocked(!0),r.buffers.depth.setLocked(!0);let a,n;this.inverse?(a=0,n=1):(a=1,n=0),r.buffers.stencil.setTest(!0),r.buffers.stencil.setOp(o.REPLACE,o.REPLACE,o.REPLACE),r.buffers.stencil.setFunc(o.ALWAYS,a,4294967295),r.buffers.stencil.setClear(n),r.buffers.stencil.setLocked(!0),t.setRenderTarget(s),this.clear&&t.clear(),t.render(this.scene,this.camera),t.setRenderTarget(i),this.clear&&t.clear(),t.render(this.scene,this.camera),r.buffers.color.setLocked(!1),r.buffers.depth.setLocked(!1),r.buffers.color.setMask(!0),r.buffers.depth.setMask(!0),r.buffers.stencil.setLocked(!1),r.buffers.stencil.setFunc(o.EQUAL,1,4294967295),r.buffers.stencil.setOp(o.KEEP,o.KEEP,o.KEEP),r.buffers.stencil.setLocked(!0)}}class fe extends B{constructor(){super(),this.needsSwap=!1}render(t){t.state.buffers.stencil.setLocked(!1),t.state.buffers.stencil.setTest(!1)}}class de{constructor(t,i){if(this.renderer=t,this._pixelRatio=t.getPixelRatio(),i===void 0){const s=t.getSize(new d);this._width=s.width,this._height=s.height,i=new q(this._width*this._pixelRatio,this._height*this._pixelRatio,{type:J}),i.texture.name="EffectComposer.rt1"}else this._width=i.width,this._height=i.height;this.renderTarget1=i,this.renderTarget2=i.clone(),this.renderTarget2.texture.name="EffectComposer.rt2",this.writeBuffer=this.renderTarget1,this.readBuffer=this.renderTarget2,this.renderToScreen=!0,this.passes=[],this.copyPass=new ue(vt),this.copyPass.material.blending=It,this.clock=new Nt}swapBuffers(){const t=this.readBuffer;this.readBuffer=this.writeBuffer,this.writeBuffer=t}addPass(t){this.passes.push(t),t.setSize(this._width*this._pixelRatio,this._height*this._pixelRatio)}insertPass(t,i){this.passes.splice(i,0,t),t.setSize(this._width*this._pixelRatio,this._height*this._pixelRatio)}removePass(t){const i=this.passes.indexOf(t);i!==-1&&this.passes.splice(i,1)}isLastEnabledPass(t){for(let i=t+1;i<this.passes.length;i++)if(this.passes[i].enabled)return!1;return!0}render(t){t===void 0&&(t=this.clock.getDelta());const i=this.renderer.getRenderTarget();let s=!1;for(let o=0,r=this.passes.length;o<r;o++){const a=this.passes[o];if(a.enabled!==!1){if(a.renderToScreen=this.renderToScreen&&this.isLastEnabledPass(o),a.render(this.renderer,this.writeBuffer,this.readBuffer,t,s),a.needsSwap){if(s){const n=this.renderer.getContext(),h=this.renderer.state.buffers.stencil;h.setFunc(n.NOTEQUAL,1,4294967295),this.copyPass.render(this.renderer,this.writeBuffer,this.readBuffer,t),h.setFunc(n.EQUAL,1,4294967295)}this.swapBuffers()}dt!==void 0&&(a instanceof dt?s=!0:a instanceof fe&&(s=!1))}}this.renderer.setRenderTarget(i)}reset(t){if(t===void 0){const i=this.renderer.getSize(new d);this._pixelRatio=this.renderer.getPixelRatio(),this._width=i.width,this._height=i.height,t=this.renderTarget1.clone(),t.setSize(this._width*this._pixelRatio,this._height*this._pixelRatio)}this.renderTarget1.dispose(),this.renderTarget2.dispose(),this.renderTarget1=t,this.renderTarget2=t.clone(),this.writeBuffer=this.renderTarget1,this.readBuffer=this.renderTarget2}setSize(t,i){this._width=t,this._height=i;const s=this._width*this._pixelRatio,o=this._height*this._pixelRatio;this.renderTarget1.setSize(s,o),this.renderTarget2.setSize(s,o);for(let r=0;r<this.passes.length;r++)this.passes[r].setSize(s,o)}setPixelRatio(t){this._pixelRatio=t,this.setSize(this._width,this._height)}dispose(){this.renderTarget1.dispose(),this.renderTarget2.dispose(),this.copyPass.dispose()}}class pe extends B{constructor(t,i,s=null,o=null,r=null){super(),this.scene=t,this.camera=i,this.overrideMaterial=s,this.clearColor=o,this.clearAlpha=r,this.clear=!0,this.clearDepth=!1,this.needsSwap=!1,this._oldClearColor=new et}render(t,i,s){const o=t.autoClear;t.autoClear=!1;let r,a;this.overrideMaterial!==null&&(a=this.scene.overrideMaterial,this.scene.overrideMaterial=this.overrideMaterial),this.clearColor!==null&&(t.getClearColor(this._oldClearColor),t.setClearColor(this.clearColor,t.getClearAlpha())),this.clearAlpha!==null&&(r=t.getClearAlpha(),t.setClearAlpha(this.clearAlpha)),this.clearDepth==!0&&t.clearDepth(),t.setRenderTarget(this.renderToScreen?null:s),this.clear===!0&&t.clear(t.autoClearColor,t.autoClearDepth,t.autoClearStencil),t.render(this.scene,this.camera),this.clearColor!==null&&t.setClearColor(this._oldClearColor),this.clearAlpha!==null&&t.setClearAlpha(r),this.overrideMaterial!==null&&(this.scene.overrideMaterial=a),t.autoClear=o}}const _e={name:"LuminosityHighPassShader",shaderID:"luminosityHighPass",uniforms:{tDiffuse:{value:null},luminosityThreshold:{value:1},smoothWidth:{value:1},defaultColor:{value:new et(0)},defaultOpacity:{value:0}},vertexShader:`
+		}`
+  )
+};
+class Pass {
+  constructor() {
+    this.isPass = true;
+    this.enabled = true;
+    this.needsSwap = true;
+    this.clear = false;
+    this.renderToScreen = false;
+  }
+  setSize() {
+  }
+  render() {
+    console.error("THREE.Pass: .render() must be implemented in derived pass.");
+  }
+  dispose() {
+  }
+}
+const _camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
+class FullscreenTriangleGeometry extends BufferGeometry {
+  constructor() {
+    super();
+    this.setAttribute("position", new Float32BufferAttribute([-1, 3, 0, -1, -1, 0, 3, -1, 0], 3));
+    this.setAttribute("uv", new Float32BufferAttribute([0, 2, 0, 0, 2, 0], 2));
+  }
+}
+const _geometry = new FullscreenTriangleGeometry();
+class FullScreenQuad {
+  constructor(material) {
+    this._mesh = new Mesh(_geometry, material);
+  }
+  dispose() {
+    this._mesh.geometry.dispose();
+  }
+  render(renderer2) {
+    renderer2.render(this._mesh, _camera);
+  }
+  get material() {
+    return this._mesh.material;
+  }
+  set material(value) {
+    this._mesh.material = value;
+  }
+}
+class ShaderPass extends Pass {
+  constructor(shader, textureID) {
+    super();
+    this.textureID = textureID !== void 0 ? textureID : "tDiffuse";
+    if (shader instanceof ShaderMaterial) {
+      this.uniforms = shader.uniforms;
+      this.material = shader;
+    } else if (shader) {
+      this.uniforms = UniformsUtils.clone(shader.uniforms);
+      this.material = new ShaderMaterial({
+        name: shader.name !== void 0 ? shader.name : "unspecified",
+        defines: Object.assign({}, shader.defines),
+        uniforms: this.uniforms,
+        vertexShader: shader.vertexShader,
+        fragmentShader: shader.fragmentShader
+      });
+    }
+    this.fsQuad = new FullScreenQuad(this.material);
+  }
+  render(renderer2, writeBuffer, readBuffer) {
+    if (this.uniforms[this.textureID]) {
+      this.uniforms[this.textureID].value = readBuffer.texture;
+    }
+    this.fsQuad.material = this.material;
+    if (this.renderToScreen) {
+      renderer2.setRenderTarget(null);
+      this.fsQuad.render(renderer2);
+    } else {
+      renderer2.setRenderTarget(writeBuffer);
+      if (this.clear) renderer2.clear(renderer2.autoClearColor, renderer2.autoClearDepth, renderer2.autoClearStencil);
+      this.fsQuad.render(renderer2);
+    }
+  }
+  dispose() {
+    this.material.dispose();
+    this.fsQuad.dispose();
+  }
+}
+class MaskPass extends Pass {
+  constructor(scene2, camera2) {
+    super();
+    this.scene = scene2;
+    this.camera = camera2;
+    this.clear = true;
+    this.needsSwap = false;
+    this.inverse = false;
+  }
+  render(renderer2, writeBuffer, readBuffer) {
+    const context = renderer2.getContext();
+    const state = renderer2.state;
+    state.buffers.color.setMask(false);
+    state.buffers.depth.setMask(false);
+    state.buffers.color.setLocked(true);
+    state.buffers.depth.setLocked(true);
+    let writeValue, clearValue;
+    if (this.inverse) {
+      writeValue = 0;
+      clearValue = 1;
+    } else {
+      writeValue = 1;
+      clearValue = 0;
+    }
+    state.buffers.stencil.setTest(true);
+    state.buffers.stencil.setOp(context.REPLACE, context.REPLACE, context.REPLACE);
+    state.buffers.stencil.setFunc(context.ALWAYS, writeValue, 4294967295);
+    state.buffers.stencil.setClear(clearValue);
+    state.buffers.stencil.setLocked(true);
+    renderer2.setRenderTarget(readBuffer);
+    if (this.clear) renderer2.clear();
+    renderer2.render(this.scene, this.camera);
+    renderer2.setRenderTarget(writeBuffer);
+    if (this.clear) renderer2.clear();
+    renderer2.render(this.scene, this.camera);
+    state.buffers.color.setLocked(false);
+    state.buffers.depth.setLocked(false);
+    state.buffers.color.setMask(true);
+    state.buffers.depth.setMask(true);
+    state.buffers.stencil.setLocked(false);
+    state.buffers.stencil.setFunc(context.EQUAL, 1, 4294967295);
+    state.buffers.stencil.setOp(context.KEEP, context.KEEP, context.KEEP);
+    state.buffers.stencil.setLocked(true);
+  }
+}
+class ClearMaskPass extends Pass {
+  constructor() {
+    super();
+    this.needsSwap = false;
+  }
+  render(renderer2) {
+    renderer2.state.buffers.stencil.setLocked(false);
+    renderer2.state.buffers.stencil.setTest(false);
+  }
+}
+class EffectComposer {
+  constructor(renderer2, renderTarget) {
+    this.renderer = renderer2;
+    this._pixelRatio = renderer2.getPixelRatio();
+    if (renderTarget === void 0) {
+      const size = renderer2.getSize(new Vector2());
+      this._width = size.width;
+      this._height = size.height;
+      renderTarget = new WebGLRenderTarget(this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType });
+      renderTarget.texture.name = "EffectComposer.rt1";
+    } else {
+      this._width = renderTarget.width;
+      this._height = renderTarget.height;
+    }
+    this.renderTarget1 = renderTarget;
+    this.renderTarget2 = renderTarget.clone();
+    this.renderTarget2.texture.name = "EffectComposer.rt2";
+    this.writeBuffer = this.renderTarget1;
+    this.readBuffer = this.renderTarget2;
+    this.renderToScreen = true;
+    this.passes = [];
+    this.copyPass = new ShaderPass(CopyShader);
+    this.copyPass.material.blending = NoBlending;
+    this.clock = new Clock();
+  }
+  swapBuffers() {
+    const tmp = this.readBuffer;
+    this.readBuffer = this.writeBuffer;
+    this.writeBuffer = tmp;
+  }
+  addPass(pass) {
+    this.passes.push(pass);
+    pass.setSize(this._width * this._pixelRatio, this._height * this._pixelRatio);
+  }
+  insertPass(pass, index) {
+    this.passes.splice(index, 0, pass);
+    pass.setSize(this._width * this._pixelRatio, this._height * this._pixelRatio);
+  }
+  removePass(pass) {
+    const index = this.passes.indexOf(pass);
+    if (index !== -1) {
+      this.passes.splice(index, 1);
+    }
+  }
+  isLastEnabledPass(passIndex) {
+    for (let i = passIndex + 1; i < this.passes.length; i++) {
+      if (this.passes[i].enabled) {
+        return false;
+      }
+    }
+    return true;
+  }
+  render(deltaTime) {
+    if (deltaTime === void 0) {
+      deltaTime = this.clock.getDelta();
+    }
+    const currentRenderTarget = this.renderer.getRenderTarget();
+    let maskActive = false;
+    for (let i = 0, il = this.passes.length; i < il; i++) {
+      const pass = this.passes[i];
+      if (pass.enabled === false) continue;
+      pass.renderToScreen = this.renderToScreen && this.isLastEnabledPass(i);
+      pass.render(this.renderer, this.writeBuffer, this.readBuffer, deltaTime, maskActive);
+      if (pass.needsSwap) {
+        if (maskActive) {
+          const context = this.renderer.getContext();
+          const stencil = this.renderer.state.buffers.stencil;
+          stencil.setFunc(context.NOTEQUAL, 1, 4294967295);
+          this.copyPass.render(this.renderer, this.writeBuffer, this.readBuffer, deltaTime);
+          stencil.setFunc(context.EQUAL, 1, 4294967295);
+        }
+        this.swapBuffers();
+      }
+      if (MaskPass !== void 0) {
+        if (pass instanceof MaskPass) {
+          maskActive = true;
+        } else if (pass instanceof ClearMaskPass) {
+          maskActive = false;
+        }
+      }
+    }
+    this.renderer.setRenderTarget(currentRenderTarget);
+  }
+  reset(renderTarget) {
+    if (renderTarget === void 0) {
+      const size = this.renderer.getSize(new Vector2());
+      this._pixelRatio = this.renderer.getPixelRatio();
+      this._width = size.width;
+      this._height = size.height;
+      renderTarget = this.renderTarget1.clone();
+      renderTarget.setSize(this._width * this._pixelRatio, this._height * this._pixelRatio);
+    }
+    this.renderTarget1.dispose();
+    this.renderTarget2.dispose();
+    this.renderTarget1 = renderTarget;
+    this.renderTarget2 = renderTarget.clone();
+    this.writeBuffer = this.renderTarget1;
+    this.readBuffer = this.renderTarget2;
+  }
+  setSize(width, height) {
+    this._width = width;
+    this._height = height;
+    const effectiveWidth = this._width * this._pixelRatio;
+    const effectiveHeight = this._height * this._pixelRatio;
+    this.renderTarget1.setSize(effectiveWidth, effectiveHeight);
+    this.renderTarget2.setSize(effectiveWidth, effectiveHeight);
+    for (let i = 0; i < this.passes.length; i++) {
+      this.passes[i].setSize(effectiveWidth, effectiveHeight);
+    }
+  }
+  setPixelRatio(pixelRatio) {
+    this._pixelRatio = pixelRatio;
+    this.setSize(this._width, this._height);
+  }
+  dispose() {
+    this.renderTarget1.dispose();
+    this.renderTarget2.dispose();
+    this.copyPass.dispose();
+  }
+}
+class RenderPass extends Pass {
+  constructor(scene2, camera2, overrideMaterial = null, clearColor = null, clearAlpha = null) {
+    super();
+    this.scene = scene2;
+    this.camera = camera2;
+    this.overrideMaterial = overrideMaterial;
+    this.clearColor = clearColor;
+    this.clearAlpha = clearAlpha;
+    this.clear = true;
+    this.clearDepth = false;
+    this.needsSwap = false;
+    this._oldClearColor = new Color();
+  }
+  render(renderer2, writeBuffer, readBuffer) {
+    const oldAutoClear = renderer2.autoClear;
+    renderer2.autoClear = false;
+    let oldClearAlpha, oldOverrideMaterial;
+    if (this.overrideMaterial !== null) {
+      oldOverrideMaterial = this.scene.overrideMaterial;
+      this.scene.overrideMaterial = this.overrideMaterial;
+    }
+    if (this.clearColor !== null) {
+      renderer2.getClearColor(this._oldClearColor);
+      renderer2.setClearColor(this.clearColor, renderer2.getClearAlpha());
+    }
+    if (this.clearAlpha !== null) {
+      oldClearAlpha = renderer2.getClearAlpha();
+      renderer2.setClearAlpha(this.clearAlpha);
+    }
+    if (this.clearDepth == true) {
+      renderer2.clearDepth();
+    }
+    renderer2.setRenderTarget(this.renderToScreen ? null : readBuffer);
+    if (this.clear === true) {
+      renderer2.clear(renderer2.autoClearColor, renderer2.autoClearDepth, renderer2.autoClearStencil);
+    }
+    renderer2.render(this.scene, this.camera);
+    if (this.clearColor !== null) {
+      renderer2.setClearColor(this._oldClearColor);
+    }
+    if (this.clearAlpha !== null) {
+      renderer2.setClearAlpha(oldClearAlpha);
+    }
+    if (this.overrideMaterial !== null) {
+      this.scene.overrideMaterial = oldOverrideMaterial;
+    }
+    renderer2.autoClear = oldAutoClear;
+  }
+}
+const LuminosityHighPassShader = {
+  name: "LuminosityHighPassShader",
+  shaderID: "luminosityHighPass",
+  uniforms: {
+    "tDiffuse": { value: null },
+    "luminosityThreshold": { value: 1 },
+    "smoothWidth": { value: 1 },
+    "defaultColor": { value: new Color(0) },
+    "defaultOpacity": { value: 0 }
+  },
+  vertexShader: (
+    /* glsl */
+    `
 
 		varying vec2 vUv;
 
@@ -31,7 +2014,11 @@ import*as u from"three";import{Ray as Et,Plane as xt,MathUtils as Dt,Vector3 as 
 
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		}`,fragmentShader:`
+		}`
+  ),
+  fragmentShader: (
+    /* glsl */
+    `
 
 		uniform sampler2D tDiffuse;
 		uniform vec3 defaultColor;
@@ -53,11 +2040,192 @@ import*as u from"three";import{Ray as Et,Plane as xt,MathUtils as Dt,Vector3 as 
 
 			gl_FragColor = mix( outputColor, texel, alpha );
 
-		}`};class F extends B{constructor(t,i,s,o){super(),this.strength=i!==void 0?i:1,this.radius=s,this.threshold=o,this.resolution=t!==void 0?new d(t.x,t.y):new d(256,256),this.clearColor=new et(0,0,0),this.renderTargetsHorizontal=[],this.renderTargetsVertical=[],this.nMips=5;let r=Math.round(this.resolution.x/2),a=Math.round(this.resolution.y/2);this.renderTargetBright=new q(r,a,{type:J}),this.renderTargetBright.texture.name="UnrealBloomPass.bright",this.renderTargetBright.texture.generateMipmaps=!1;for(let f=0;f<this.nMips;f++){const w=new q(r,a,{type:J});w.texture.name="UnrealBloomPass.h"+f,w.texture.generateMipmaps=!1,this.renderTargetsHorizontal.push(w);const y=new q(r,a,{type:J});y.texture.name="UnrealBloomPass.v"+f,y.texture.generateMipmaps=!1,this.renderTargetsVertical.push(y),r=Math.round(r/2),a=Math.round(a/2)}const n=_e;this.highPassUniforms=tt.clone(n.uniforms),this.highPassUniforms.luminosityThreshold.value=o,this.highPassUniforms.smoothWidth.value=.01,this.materialHighPassFilter=new k({uniforms:this.highPassUniforms,vertexShader:n.vertexShader,fragmentShader:n.fragmentShader}),this.separableBlurMaterials=[];const h=[3,5,7,9,11];r=Math.round(this.resolution.x/2),a=Math.round(this.resolution.y/2);for(let f=0;f<this.nMips;f++)this.separableBlurMaterials.push(this.getSeperableBlurMaterial(h[f])),this.separableBlurMaterials[f].uniforms.invSize.value=new d(1/r,1/a),r=Math.round(r/2),a=Math.round(a/2);this.compositeMaterial=this.getCompositeMaterial(this.nMips),this.compositeMaterial.uniforms.blurTexture1.value=this.renderTargetsVertical[0].texture,this.compositeMaterial.uniforms.blurTexture2.value=this.renderTargetsVertical[1].texture,this.compositeMaterial.uniforms.blurTexture3.value=this.renderTargetsVertical[2].texture,this.compositeMaterial.uniforms.blurTexture4.value=this.renderTargetsVertical[3].texture,this.compositeMaterial.uniforms.blurTexture5.value=this.renderTargetsVertical[4].texture,this.compositeMaterial.uniforms.bloomStrength.value=i,this.compositeMaterial.uniforms.bloomRadius.value=.1;const p=[1,.8,.6,.4,.2];this.compositeMaterial.uniforms.bloomFactors.value=p,this.bloomTintColors=[new g(1,1,1),new g(1,1,1),new g(1,1,1),new g(1,1,1),new g(1,1,1)],this.compositeMaterial.uniforms.bloomTintColors.value=this.bloomTintColors;const m=vt;this.copyUniforms=tt.clone(m.uniforms),this.blendMaterial=new k({uniforms:this.copyUniforms,vertexShader:m.vertexShader,fragmentShader:m.fragmentShader,blending:Ut,depthTest:!1,depthWrite:!1,transparent:!0}),this.enabled=!0,this.needsSwap=!1,this._oldClearColor=new et,this.oldClearAlpha=1,this.basic=new kt,this.fsQuad=new at(null)}dispose(){for(let t=0;t<this.renderTargetsHorizontal.length;t++)this.renderTargetsHorizontal[t].dispose();for(let t=0;t<this.renderTargetsVertical.length;t++)this.renderTargetsVertical[t].dispose();this.renderTargetBright.dispose();for(let t=0;t<this.separableBlurMaterials.length;t++)this.separableBlurMaterials[t].dispose();this.compositeMaterial.dispose(),this.blendMaterial.dispose(),this.basic.dispose(),this.fsQuad.dispose()}setSize(t,i){let s=Math.round(t/2),o=Math.round(i/2);this.renderTargetBright.setSize(s,o);for(let r=0;r<this.nMips;r++)this.renderTargetsHorizontal[r].setSize(s,o),this.renderTargetsVertical[r].setSize(s,o),this.separableBlurMaterials[r].uniforms.invSize.value=new d(1/s,1/o),s=Math.round(s/2),o=Math.round(o/2)}render(t,i,s,o,r){t.getClearColor(this._oldClearColor),this.oldClearAlpha=t.getClearAlpha();const a=t.autoClear;t.autoClear=!1,t.setClearColor(this.clearColor,0),r&&t.state.buffers.stencil.setTest(!1),this.renderToScreen&&(this.fsQuad.material=this.basic,this.basic.map=s.texture,t.setRenderTarget(null),t.clear(),this.fsQuad.render(t)),this.highPassUniforms.tDiffuse.value=s.texture,this.highPassUniforms.luminosityThreshold.value=this.threshold,this.fsQuad.material=this.materialHighPassFilter,t.setRenderTarget(this.renderTargetBright),t.clear(),this.fsQuad.render(t);let n=this.renderTargetBright;for(let h=0;h<this.nMips;h++)this.fsQuad.material=this.separableBlurMaterials[h],this.separableBlurMaterials[h].uniforms.colorTexture.value=n.texture,this.separableBlurMaterials[h].uniforms.direction.value=F.BlurDirectionX,t.setRenderTarget(this.renderTargetsHorizontal[h]),t.clear(),this.fsQuad.render(t),this.separableBlurMaterials[h].uniforms.colorTexture.value=this.renderTargetsHorizontal[h].texture,this.separableBlurMaterials[h].uniforms.direction.value=F.BlurDirectionY,t.setRenderTarget(this.renderTargetsVertical[h]),t.clear(),this.fsQuad.render(t),n=this.renderTargetsVertical[h];this.fsQuad.material=this.compositeMaterial,this.compositeMaterial.uniforms.bloomStrength.value=this.strength,this.compositeMaterial.uniforms.bloomRadius.value=this.radius,this.compositeMaterial.uniforms.bloomTintColors.value=this.bloomTintColors,t.setRenderTarget(this.renderTargetsHorizontal[0]),t.clear(),this.fsQuad.render(t),this.fsQuad.material=this.blendMaterial,this.copyUniforms.tDiffuse.value=this.renderTargetsHorizontal[0].texture,r&&t.state.buffers.stencil.setTest(!0),this.renderToScreen?(t.setRenderTarget(null),this.fsQuad.render(t)):(t.setRenderTarget(s),this.fsQuad.render(t)),t.setClearColor(this._oldClearColor,this.oldClearAlpha),t.autoClear=a}getSeperableBlurMaterial(t){const i=[];for(let s=0;s<t;s++)i.push(.39894*Math.exp(-.5*s*s/(t*t))/t);return new k({defines:{KERNEL_RADIUS:t},uniforms:{colorTexture:{value:null},invSize:{value:new d(.5,.5)},direction:{value:new d(.5,.5)},gaussianCoefficients:{value:i}},vertexShader:`varying vec2 vUv;
+		}`
+  )
+};
+class UnrealBloomPass extends Pass {
+  constructor(resolution, strength, radius, threshold) {
+    super();
+    this.strength = strength !== void 0 ? strength : 1;
+    this.radius = radius;
+    this.threshold = threshold;
+    this.resolution = resolution !== void 0 ? new Vector2(resolution.x, resolution.y) : new Vector2(256, 256);
+    this.clearColor = new Color(0, 0, 0);
+    this.renderTargetsHorizontal = [];
+    this.renderTargetsVertical = [];
+    this.nMips = 5;
+    let resx = Math.round(this.resolution.x / 2);
+    let resy = Math.round(this.resolution.y / 2);
+    this.renderTargetBright = new WebGLRenderTarget(resx, resy, { type: HalfFloatType });
+    this.renderTargetBright.texture.name = "UnrealBloomPass.bright";
+    this.renderTargetBright.texture.generateMipmaps = false;
+    for (let i = 0; i < this.nMips; i++) {
+      const renderTargetHorizontal = new WebGLRenderTarget(resx, resy, { type: HalfFloatType });
+      renderTargetHorizontal.texture.name = "UnrealBloomPass.h" + i;
+      renderTargetHorizontal.texture.generateMipmaps = false;
+      this.renderTargetsHorizontal.push(renderTargetHorizontal);
+      const renderTargetVertical = new WebGLRenderTarget(resx, resy, { type: HalfFloatType });
+      renderTargetVertical.texture.name = "UnrealBloomPass.v" + i;
+      renderTargetVertical.texture.generateMipmaps = false;
+      this.renderTargetsVertical.push(renderTargetVertical);
+      resx = Math.round(resx / 2);
+      resy = Math.round(resy / 2);
+    }
+    const highPassShader = LuminosityHighPassShader;
+    this.highPassUniforms = UniformsUtils.clone(highPassShader.uniforms);
+    this.highPassUniforms["luminosityThreshold"].value = threshold;
+    this.highPassUniforms["smoothWidth"].value = 0.01;
+    this.materialHighPassFilter = new ShaderMaterial({
+      uniforms: this.highPassUniforms,
+      vertexShader: highPassShader.vertexShader,
+      fragmentShader: highPassShader.fragmentShader
+    });
+    this.separableBlurMaterials = [];
+    const kernelSizeArray = [3, 5, 7, 9, 11];
+    resx = Math.round(this.resolution.x / 2);
+    resy = Math.round(this.resolution.y / 2);
+    for (let i = 0; i < this.nMips; i++) {
+      this.separableBlurMaterials.push(this.getSeperableBlurMaterial(kernelSizeArray[i]));
+      this.separableBlurMaterials[i].uniforms["invSize"].value = new Vector2(1 / resx, 1 / resy);
+      resx = Math.round(resx / 2);
+      resy = Math.round(resy / 2);
+    }
+    this.compositeMaterial = this.getCompositeMaterial(this.nMips);
+    this.compositeMaterial.uniforms["blurTexture1"].value = this.renderTargetsVertical[0].texture;
+    this.compositeMaterial.uniforms["blurTexture2"].value = this.renderTargetsVertical[1].texture;
+    this.compositeMaterial.uniforms["blurTexture3"].value = this.renderTargetsVertical[2].texture;
+    this.compositeMaterial.uniforms["blurTexture4"].value = this.renderTargetsVertical[3].texture;
+    this.compositeMaterial.uniforms["blurTexture5"].value = this.renderTargetsVertical[4].texture;
+    this.compositeMaterial.uniforms["bloomStrength"].value = strength;
+    this.compositeMaterial.uniforms["bloomRadius"].value = 0.1;
+    const bloomFactors = [1, 0.8, 0.6, 0.4, 0.2];
+    this.compositeMaterial.uniforms["bloomFactors"].value = bloomFactors;
+    this.bloomTintColors = [new Vector3(1, 1, 1), new Vector3(1, 1, 1), new Vector3(1, 1, 1), new Vector3(1, 1, 1), new Vector3(1, 1, 1)];
+    this.compositeMaterial.uniforms["bloomTintColors"].value = this.bloomTintColors;
+    const copyShader = CopyShader;
+    this.copyUniforms = UniformsUtils.clone(copyShader.uniforms);
+    this.blendMaterial = new ShaderMaterial({
+      uniforms: this.copyUniforms,
+      vertexShader: copyShader.vertexShader,
+      fragmentShader: copyShader.fragmentShader,
+      blending: AdditiveBlending,
+      depthTest: false,
+      depthWrite: false,
+      transparent: true
+    });
+    this.enabled = true;
+    this.needsSwap = false;
+    this._oldClearColor = new Color();
+    this.oldClearAlpha = 1;
+    this.basic = new MeshBasicMaterial();
+    this.fsQuad = new FullScreenQuad(null);
+  }
+  dispose() {
+    for (let i = 0; i < this.renderTargetsHorizontal.length; i++) {
+      this.renderTargetsHorizontal[i].dispose();
+    }
+    for (let i = 0; i < this.renderTargetsVertical.length; i++) {
+      this.renderTargetsVertical[i].dispose();
+    }
+    this.renderTargetBright.dispose();
+    for (let i = 0; i < this.separableBlurMaterials.length; i++) {
+      this.separableBlurMaterials[i].dispose();
+    }
+    this.compositeMaterial.dispose();
+    this.blendMaterial.dispose();
+    this.basic.dispose();
+    this.fsQuad.dispose();
+  }
+  setSize(width, height) {
+    let resx = Math.round(width / 2);
+    let resy = Math.round(height / 2);
+    this.renderTargetBright.setSize(resx, resy);
+    for (let i = 0; i < this.nMips; i++) {
+      this.renderTargetsHorizontal[i].setSize(resx, resy);
+      this.renderTargetsVertical[i].setSize(resx, resy);
+      this.separableBlurMaterials[i].uniforms["invSize"].value = new Vector2(1 / resx, 1 / resy);
+      resx = Math.round(resx / 2);
+      resy = Math.round(resy / 2);
+    }
+  }
+  render(renderer2, writeBuffer, readBuffer, deltaTime, maskActive) {
+    renderer2.getClearColor(this._oldClearColor);
+    this.oldClearAlpha = renderer2.getClearAlpha();
+    const oldAutoClear = renderer2.autoClear;
+    renderer2.autoClear = false;
+    renderer2.setClearColor(this.clearColor, 0);
+    if (maskActive) renderer2.state.buffers.stencil.setTest(false);
+    if (this.renderToScreen) {
+      this.fsQuad.material = this.basic;
+      this.basic.map = readBuffer.texture;
+      renderer2.setRenderTarget(null);
+      renderer2.clear();
+      this.fsQuad.render(renderer2);
+    }
+    this.highPassUniforms["tDiffuse"].value = readBuffer.texture;
+    this.highPassUniforms["luminosityThreshold"].value = this.threshold;
+    this.fsQuad.material = this.materialHighPassFilter;
+    renderer2.setRenderTarget(this.renderTargetBright);
+    renderer2.clear();
+    this.fsQuad.render(renderer2);
+    let inputRenderTarget = this.renderTargetBright;
+    for (let i = 0; i < this.nMips; i++) {
+      this.fsQuad.material = this.separableBlurMaterials[i];
+      this.separableBlurMaterials[i].uniforms["colorTexture"].value = inputRenderTarget.texture;
+      this.separableBlurMaterials[i].uniforms["direction"].value = UnrealBloomPass.BlurDirectionX;
+      renderer2.setRenderTarget(this.renderTargetsHorizontal[i]);
+      renderer2.clear();
+      this.fsQuad.render(renderer2);
+      this.separableBlurMaterials[i].uniforms["colorTexture"].value = this.renderTargetsHorizontal[i].texture;
+      this.separableBlurMaterials[i].uniforms["direction"].value = UnrealBloomPass.BlurDirectionY;
+      renderer2.setRenderTarget(this.renderTargetsVertical[i]);
+      renderer2.clear();
+      this.fsQuad.render(renderer2);
+      inputRenderTarget = this.renderTargetsVertical[i];
+    }
+    this.fsQuad.material = this.compositeMaterial;
+    this.compositeMaterial.uniforms["bloomStrength"].value = this.strength;
+    this.compositeMaterial.uniforms["bloomRadius"].value = this.radius;
+    this.compositeMaterial.uniforms["bloomTintColors"].value = this.bloomTintColors;
+    renderer2.setRenderTarget(this.renderTargetsHorizontal[0]);
+    renderer2.clear();
+    this.fsQuad.render(renderer2);
+    this.fsQuad.material = this.blendMaterial;
+    this.copyUniforms["tDiffuse"].value = this.renderTargetsHorizontal[0].texture;
+    if (maskActive) renderer2.state.buffers.stencil.setTest(true);
+    if (this.renderToScreen) {
+      renderer2.setRenderTarget(null);
+      this.fsQuad.render(renderer2);
+    } else {
+      renderer2.setRenderTarget(readBuffer);
+      this.fsQuad.render(renderer2);
+    }
+    renderer2.setClearColor(this._oldClearColor, this.oldClearAlpha);
+    renderer2.autoClear = oldAutoClear;
+  }
+  getSeperableBlurMaterial(kernelRadius) {
+    const coefficients = [];
+    for (let i = 0; i < kernelRadius; i++) {
+      coefficients.push(0.39894 * Math.exp(-0.5 * i * i / (kernelRadius * kernelRadius)) / kernelRadius);
+    }
+    return new ShaderMaterial({
+      defines: {
+        "KERNEL_RADIUS": kernelRadius
+      },
+      uniforms: {
+        "colorTexture": { value: null },
+        "invSize": { value: new Vector2(0.5, 0.5) },
+        // inverse texture size
+        "direction": { value: new Vector2(0.5, 0.5) },
+        "gaussianCoefficients": { value: coefficients }
+        // precomputed Gaussian coefficients
+      },
+      vertexShader: `varying vec2 vUv;
 				void main() {
 					vUv = uv;
 					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-				}`,fragmentShader:`#include <common>
+				}`,
+      fragmentShader: `#include <common>
 				varying vec2 vUv;
 				uniform sampler2D colorTexture;
 				uniform vec2 invSize;
@@ -77,11 +2245,31 @@ import*as u from"three";import{Ray as Et,Plane as xt,MathUtils as Dt,Vector3 as 
 						weightSum += 2.0 * w;
 					}
 					gl_FragColor = vec4(diffuseSum/weightSum, 1.0);
-				}`})}getCompositeMaterial(t){return new k({defines:{NUM_MIPS:t},uniforms:{blurTexture1:{value:null},blurTexture2:{value:null},blurTexture3:{value:null},blurTexture4:{value:null},blurTexture5:{value:null},bloomStrength:{value:1},bloomFactors:{value:null},bloomTintColors:{value:null},bloomRadius:{value:0}},vertexShader:`varying vec2 vUv;
+				}`
+    });
+  }
+  getCompositeMaterial(nMips) {
+    return new ShaderMaterial({
+      defines: {
+        "NUM_MIPS": nMips
+      },
+      uniforms: {
+        "blurTexture1": { value: null },
+        "blurTexture2": { value: null },
+        "blurTexture3": { value: null },
+        "blurTexture4": { value: null },
+        "blurTexture5": { value: null },
+        "bloomStrength": { value: 1 },
+        "bloomFactors": { value: null },
+        "bloomTintColors": { value: null },
+        "bloomRadius": { value: 0 }
+      },
+      vertexShader: `varying vec2 vUv;
 				void main() {
 					vUv = uv;
 					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-				}`,fragmentShader:`varying vec2 vUv;
+				}`,
+      fragmentShader: `varying vec2 vUv;
 				uniform sampler2D blurTexture1;
 				uniform sampler2D blurTexture2;
 				uniform sampler2D blurTexture3;
@@ -103,7 +2291,21 @@ import*as u from"three";import{Ray as Et,Plane as xt,MathUtils as Dt,Vector3 as 
 						lerpBloomFactor(bloomFactors[2]) * vec4(bloomTintColors[2], 1.0) * texture2D(blurTexture3, vUv) +
 						lerpBloomFactor(bloomFactors[3]) * vec4(bloomTintColors[3], 1.0) * texture2D(blurTexture4, vUv) +
 						lerpBloomFactor(bloomFactors[4]) * vec4(bloomTintColors[4], 1.0) * texture2D(blurTexture5, vUv) );
-				}`})}}F.BlurDirectionX=new d(1,0);F.BlurDirectionY=new d(0,1);const me={name:"OutputShader",uniforms:{tDiffuse:{value:null},toneMappingExposure:{value:1}},vertexShader:`
+				}`
+    });
+  }
+}
+UnrealBloomPass.BlurDirectionX = new Vector2(1, 0);
+UnrealBloomPass.BlurDirectionY = new Vector2(0, 1);
+const OutputShader = {
+  name: "OutputShader",
+  uniforms: {
+    "tDiffuse": { value: null },
+    "toneMappingExposure": { value: 1 }
+  },
+  vertexShader: (
+    /* glsl */
+    `
 		precision highp float;
 
 		uniform mat4 modelViewMatrix;
@@ -119,7 +2321,11 @@ import*as u from"three";import{Ray as Et,Plane as xt,MathUtils as Dt,Vector3 as 
 			vUv = uv;
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		}`,fragmentShader:`
+		}`
+  ),
+  fragmentShader: (
+    /* glsl */
+    `
 	
 		precision highp float;
 
@@ -170,4 +2376,293 @@ import*as u from"three";import{Ray as Et,Plane as xt,MathUtils as Dt,Vector3 as 
 
 			#endif
 
-		}`};class ge extends B{constructor(){super();const t=me;this.uniforms=tt.clone(t.uniforms),this.material=new jt({name:t.name,uniforms:this.uniforms,vertexShader:t.vertexShader,fragmentShader:t.fragmentShader}),this.fsQuad=new at(this.material),this._outputColorSpace=null,this._toneMapping=null}render(t,i,s){this.uniforms.tDiffuse.value=s.texture,this.uniforms.toneMappingExposure.value=t.toneMappingExposure,(this._outputColorSpace!==t.outputColorSpace||this._toneMapping!==t.toneMapping)&&(this._outputColorSpace=t.outputColorSpace,this._toneMapping=t.toneMapping,this.material.defines={},zt.getTransfer(this._outputColorSpace)===Ft&&(this.material.defines.SRGB_TRANSFER=""),this._toneMapping===Bt?this.material.defines.LINEAR_TONE_MAPPING="":this._toneMapping===Ht?this.material.defines.REINHARD_TONE_MAPPING="":this._toneMapping===Yt?this.material.defines.CINEON_TONE_MAPPING="":this._toneMapping===Qt?this.material.defines.ACES_FILMIC_TONE_MAPPING="":this._toneMapping===Kt?this.material.defines.AGX_TONE_MAPPING="":this._toneMapping===Wt&&(this.material.defines.NEUTRAL_TONE_MAPPING=""),this.material.needsUpdate=!0),this.renderToScreen===!0?(t.setRenderTarget(null),this.fsQuad.render(t)):(t.setRenderTarget(i),this.clear&&t.clear(t.autoClearColor,t.autoClearDepth,t.autoClearStencil),this.fsQuad.render(t))}dispose(){this.material.dispose(),this.fsQuad.dispose()}}const H=new u.Scene,b=new u.PerspectiveCamera(75,window.innerWidth/window.innerHeight,.1,2e3),S=new u.WebGLRenderer({antialias:!0});S.setSize(window.innerWidth,window.innerHeight);S.setClearColor(2236962);document.body.appendChild(S.domElement);const C=256,be=13,ve=10;function ye(e){const t=e/C*Math.PI*2*be,i=12,s=e*1.75,o=1+s/(C*.5)*ve,r=i*o;return{x:Math.cos(t)*r,y:s-C*.25,z:Math.sin(t)*r}}const O=new u.Group;H.add(O);for(let e=0;e<C;e++){const i=new u.BoxGeometry(2.4,2.4,2.4),s=new u.MeshPhongMaterial({color:1698883,emissive:new u.Color(1698883).multiplyScalar(.2),shininess:100}),o=new u.Mesh(i,s),r=ye(e);o.position.set(r.x,r.y,r.z);const n=1+(r.y+C*.25)/(C*1.75)*2.5;o.scale.set(n,n,n),O.add(o)}const we=new u.AmbientLight(4210752,1.6);H.add(we);const yt=new u.DirectionalLight(16777215,1.2);yt.position.set(10,10,10);H.add(yt);const wt=new u.DirectionalLight(8042751,.8);wt.position.set(-15,5,-15);H.add(wt);const Tt=new u.DirectionalLight(16777215,.4);Tt.position.set(0,-10,0);H.add(Tt);b.position.set(15,-50,140);b.lookAt(0,0,0);const Mt=new Xt(b,S.domElement);Mt.enableDamping=!0;window.addEventListener("resize",()=>{S.setSize(window.innerWidth,window.innerHeight),b.aspect=window.innerWidth/window.innerHeight,b.updateProjectionMatrix()});const N=new gt;function St(e,t){const i=(t+1)%C;if(t%2===0){const o=["x","y","z"],r=o[Math.floor(Math.random()*o.length)],a=e.rotation[r]+Math.PI/2,n=new u.Color(1698883),h=new u.Color(1698883).multiplyScalar(2),p=e.material;p.emissive.copy(n).multiplyScalar(.2),new K(p.color,N).to(h,200).easing(T.Quadratic.Out).onUpdate(()=>{p.emissive.copy(p.color).multiplyScalar(.3)}).chain(new K(p.color,N).to(n,600).easing(T.Quadratic.InOut).onUpdate(()=>{p.emissive.copy(p.color).multiplyScalar(.2)})).start();const m=e.position.y,f=(m+C*.25)/(C*1.75),w=.75+Math.random()*.5,y=1+f*2,Y=w*y,x=400+Math.random()*200;new K(e.position,N).to({y:m+Y},x).easing(T.Quadratic.Out).chain(new K(e.position,N).to({y:m},x).easing(T.Quadratic.In)).start(),new K(e.rotation,N).to({[r]:a},x*.8).easing(T.Quadratic.InOut).start()}const s=1e3+Math.random()*200;setTimeout(()=>St(e,i),s)}O.children.forEach((e,t)=>St(e,t));const E=new u.PerspectiveCamera(75,window.innerWidth/window.innerHeight,.1,1e3);let l=b;window.addEventListener("keydown",e=>{(e.key==="c"||e.key==="C")&&(console.log("switching camera"),l===b?l=E:l===E?l=L:l===L?l=P:l===P?l=R:l===R?l=I:l===I?l=G:l=b)});const $={threshold:.5,strength:.5,radius:.02,exposure:.4},Pt=new pe(H,b),Te=new F(new u.Vector2(window.innerWidth,window.innerHeight),$.strength,$.radius,$.threshold),Me=new ge,Z=new de(S);Z.addPass(Pt);Z.addPass(Te);Z.addPass(Me);S.toneMapping=u.ACESFilmicToneMapping;S.toneMappingExposure=$.exposure;S.setClearColor(1710618);window.addEventListener("resize",()=>{const e=window.innerWidth,t=window.innerHeight;b.aspect=e/t,b.updateProjectionMatrix(),E.aspect=e/t,E.updateProjectionMatrix(),S.setSize(e,t),Z.setSize(e,t)});const st=O.children[13],L=new u.PerspectiveCamera(75,window.innerWidth/window.innerHeight,.1,1e3),pt=O.children[30],P=new u.PerspectiveCamera(75,window.innerWidth/window.innerHeight,.1,1e3);let V=0;const R=new u.PerspectiveCamera(50,window.innerWidth/window.innerHeight,.1,1e3);R.position.set(0,300,0);R.lookAt(0,0,0);l=R;const I=new u.PerspectiveCamera(45,window.innerWidth/window.innerHeight,.1,1e3),Se=O.children[40],G=new u.PerspectiveCamera(40,window.innerWidth/window.innerHeight,.1,1e3),_t=O.children[50],mt={main:b,cube:E,spiral:L,orbiting:P,top:R,cube20:I,cube20_2:G};function A(e){const t=new URL(window.location.href);t.searchParams.set("camera",e),window.history.replaceState({},"",t.toString())}function Pe(){const t=new URLSearchParams(window.location.search).get("camera");return t&&mt[t]?mt[t]:b}l=Pe();window.addEventListener("keydown",e=>{(e.key==="c"||e.key==="C")&&(console.log("switching camera"),l===b?(l=E,A("cube")):l===E?(l=L,A("spiral")):l===L?(l=P,A("orbiting")):l===P?(l=R,A("top")):l===R?(l=I,A("cube20")):l===I?(l=G,A("cube20_2")):(l=b,A("main")))});function Ct(){requestAnimationFrame(Ct),O.rotation.y-=.0015;const e=new u.Vector3(0,0,2);e.applyQuaternion(st.quaternion),E.position.copy(st.position).add(e),E.lookAt(st.position);const t=new u.Vector3(0,0,15);t.applyMatrix4(pt.matrixWorld),L.position.copy(t),L.lookAt(pt.position),V+=.005;const i=200,s=Math.sin(V*.5)*100;P.position.x=Math.cos(V)*i,P.position.z=Math.sin(V)*i,P.position.y=s,P.lookAt(0,0,0),I.position.copy(Se.position),I.lookAt(0,0,0);const o=_t.position.clone().negate().normalize();G.position.copy(_t.position).add(o.multiplyScalar(-20)),G.lookAt(0,-8,0),Pt.camera=l,N.update(),Mt.update(),Z.render()}Ct();
+		}`
+  )
+};
+class OutputPass extends Pass {
+  constructor() {
+    super();
+    const shader = OutputShader;
+    this.uniforms = UniformsUtils.clone(shader.uniforms);
+    this.material = new RawShaderMaterial({
+      name: shader.name,
+      uniforms: this.uniforms,
+      vertexShader: shader.vertexShader,
+      fragmentShader: shader.fragmentShader
+    });
+    this.fsQuad = new FullScreenQuad(this.material);
+    this._outputColorSpace = null;
+    this._toneMapping = null;
+  }
+  render(renderer2, writeBuffer, readBuffer) {
+    this.uniforms["tDiffuse"].value = readBuffer.texture;
+    this.uniforms["toneMappingExposure"].value = renderer2.toneMappingExposure;
+    if (this._outputColorSpace !== renderer2.outputColorSpace || this._toneMapping !== renderer2.toneMapping) {
+      this._outputColorSpace = renderer2.outputColorSpace;
+      this._toneMapping = renderer2.toneMapping;
+      this.material.defines = {};
+      if (ColorManagement.getTransfer(this._outputColorSpace) === SRGBTransfer) this.material.defines.SRGB_TRANSFER = "";
+      if (this._toneMapping === LinearToneMapping) this.material.defines.LINEAR_TONE_MAPPING = "";
+      else if (this._toneMapping === ReinhardToneMapping) this.material.defines.REINHARD_TONE_MAPPING = "";
+      else if (this._toneMapping === CineonToneMapping) this.material.defines.CINEON_TONE_MAPPING = "";
+      else if (this._toneMapping === ACESFilmicToneMapping) this.material.defines.ACES_FILMIC_TONE_MAPPING = "";
+      else if (this._toneMapping === AgXToneMapping) this.material.defines.AGX_TONE_MAPPING = "";
+      else if (this._toneMapping === NeutralToneMapping) this.material.defines.NEUTRAL_TONE_MAPPING = "";
+      this.material.needsUpdate = true;
+    }
+    if (this.renderToScreen === true) {
+      renderer2.setRenderTarget(null);
+      this.fsQuad.render(renderer2);
+    } else {
+      renderer2.setRenderTarget(writeBuffer);
+      if (this.clear) renderer2.clear(renderer2.autoClearColor, renderer2.autoClearDepth, renderer2.autoClearStencil);
+      this.fsQuad.render(renderer2);
+    }
+  }
+  dispose() {
+    this.material.dispose();
+    this.fsQuad.dispose();
+  }
+}
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(
+  75,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  2e3
+);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(2236962);
+document.body.appendChild(renderer.domElement);
+const CUBE_COUNT = 256;
+const SPIRAL_ORBITS = 13;
+const SPIRAL_EXPANSION_RATIO = 10;
+function getSpiralPosition(index) {
+  const angle = index / CUBE_COUNT * Math.PI * 2 * SPIRAL_ORBITS;
+  const baseRadius = 12;
+  const height = index * 1.75;
+  const radiusMultiplier = 1 + height / (CUBE_COUNT * 0.5) * SPIRAL_EXPANSION_RATIO;
+  const radius = baseRadius * radiusMultiplier;
+  return {
+    x: Math.cos(angle) * radius,
+    y: height - CUBE_COUNT * 0.25,
+    z: Math.sin(angle) * radius
+  };
+}
+const cubeGroup = new THREE.Group();
+scene.add(cubeGroup);
+for (let i = 0; i < CUBE_COUNT; i++) {
+  const cubeSize = 2.4;
+  const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+  const material = new THREE.MeshPhongMaterial({
+    color: 1698883,
+    // Halfway between 0x00FF00 and 0x31D886
+    emissive: new THREE.Color(1698883).multiplyScalar(0.2),
+    shininess: 100
+  });
+  const cube = new THREE.Mesh(geometry, material);
+  const pos = getSpiralPosition(i);
+  cube.position.set(pos.x, pos.y, pos.z);
+  const normalizedHeight = (pos.y + CUBE_COUNT * 0.25) / (CUBE_COUNT * 1.75);
+  const scaleMultiplier = 1 + normalizedHeight * 2.5;
+  cube.scale.set(scaleMultiplier, scaleMultiplier, scaleMultiplier);
+  cubeGroup.add(cube);
+}
+const ambientLight = new THREE.AmbientLight(4210752, 1.6);
+scene.add(ambientLight);
+const mainLight = new THREE.DirectionalLight(16777215, 1.2);
+mainLight.position.set(10, 10, 10);
+scene.add(mainLight);
+const accentLight = new THREE.DirectionalLight(8042751, 0.8);
+accentLight.position.set(-15, 5, -15);
+scene.add(accentLight);
+const rimLight = new THREE.DirectionalLight(16777215, 0.4);
+rimLight.position.set(0, -10, 0);
+scene.add(rimLight);
+camera.position.set(15, -50, 140);
+camera.lookAt(0, 0, 0);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+window.addEventListener("resize", () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+});
+const tweenGroup = new Group();
+function createRandomRotation(cube, currentIndex) {
+  const nextIndex = (currentIndex + 1) % CUBE_COUNT;
+  if (currentIndex % 2 === 0) {
+    const axes = ["x", "y", "z"];
+    const randomAxis = axes[Math.floor(Math.random() * axes.length)];
+    const targetRotation = cube.rotation[randomAxis] + Math.PI / 2;
+    const baseColor = new THREE.Color(1698883);
+    const activeColor = new THREE.Color(1698883).multiplyScalar(2);
+    const material = cube.material;
+    material.emissive.copy(baseColor).multiplyScalar(0.2);
+    new Tween(material.color, tweenGroup).to(activeColor, 200).easing(Easing.Quadratic.Out).onUpdate(() => {
+      material.emissive.copy(material.color).multiplyScalar(0.3);
+    }).chain(
+      new Tween(material.color, tweenGroup).to(baseColor, 600).easing(Easing.Quadratic.InOut).onUpdate(() => {
+        material.emissive.copy(material.color).multiplyScalar(0.2);
+      })
+    ).start();
+    const currentY = cube.position.y;
+    const normalizedHeight = (currentY + CUBE_COUNT * 0.25) / (CUBE_COUNT * 1.75);
+    const baseJumpHeight = 0.75 + Math.random() * 0.5;
+    const heightMultiplier = 1 + normalizedHeight * 2;
+    const jumpHeight = baseJumpHeight * heightMultiplier;
+    const jumpDuration = 400 + Math.random() * 200;
+    new Tween(cube.position, tweenGroup).to({ y: currentY + jumpHeight }, jumpDuration).easing(Easing.Quadratic.Out).chain(
+      new Tween(cube.position, tweenGroup).to({ y: currentY }, jumpDuration).easing(Easing.Quadratic.In)
+    ).start();
+    new Tween(cube.rotation, tweenGroup).to({ [randomAxis]: targetRotation }, jumpDuration * 0.8).easing(Easing.Quadratic.InOut).start();
+  }
+  const nextDelay = 1e3 + Math.random() * 200;
+  setTimeout(() => createRandomRotation(cube, nextIndex), nextDelay);
+}
+cubeGroup.children.forEach((cube, index) => createRandomRotation(cube, index));
+const cubeCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1e3);
+let activeCamera = camera;
+window.addEventListener("keydown", (event) => {
+  if (event.key === "c" || event.key === "C") {
+    console.log("switching camera");
+    if (activeCamera === camera) {
+      activeCamera = cubeCamera;
+    } else if (activeCamera === cubeCamera) {
+      activeCamera = spiralCamera;
+    } else if (activeCamera === spiralCamera) {
+      activeCamera = orbitingCamera;
+    } else if (activeCamera === orbitingCamera) {
+      activeCamera = topCamera;
+    } else if (activeCamera === topCamera) {
+      activeCamera = cube20Camera;
+    } else if (activeCamera === cube20Camera) {
+      activeCamera = cube20Camera2;
+    } else {
+      activeCamera = camera;
+    }
+  }
+});
+const bloomParams = {
+  threshold: 0.5,
+  strength: 0.5,
+  // 5
+  radius: 0.02,
+  exposure: 0.4
+};
+const renderScene = new RenderPass(scene, camera);
+const bloomPass = new UnrealBloomPass(
+  new THREE.Vector2(window.innerWidth, window.innerHeight),
+  bloomParams.strength,
+  bloomParams.radius,
+  bloomParams.threshold
+);
+const outputPass = new OutputPass();
+const composer = new EffectComposer(renderer);
+composer.addPass(renderScene);
+composer.addPass(bloomPass);
+composer.addPass(outputPass);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = bloomParams.exposure;
+renderer.setClearColor(1710618);
+window.addEventListener("resize", () => {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+  cubeCamera.aspect = width / height;
+  cubeCamera.updateProjectionMatrix();
+  renderer.setSize(width, height);
+  composer.setSize(width, height);
+});
+const targetCube = cubeGroup.children[13];
+const spiralCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1e3);
+const targetCubeForSpiral = cubeGroup.children[30];
+const orbitingCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1e3);
+let orbitAngle = 0;
+const topCamera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1e3);
+topCamera.position.set(0, 300, 0);
+topCamera.lookAt(0, 0, 0);
+activeCamera = topCamera;
+const cube20Camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1e3);
+const targetCube20 = cubeGroup.children[40];
+const cube20Camera2 = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1e3);
+const targetCube20_2 = cubeGroup.children[50];
+const cameraMap = {
+  "main": camera,
+  "cube": cubeCamera,
+  "spiral": spiralCamera,
+  "orbiting": orbitingCamera,
+  "top": topCamera,
+  "cube20": cube20Camera,
+  "cube20_2": cube20Camera2
+};
+function updateCameraQueryString(cameraName) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("camera", cameraName);
+  window.history.replaceState({}, "", url.toString());
+}
+function getInitialCamera() {
+  const params = new URLSearchParams(window.location.search);
+  const cameraParam = params.get("camera");
+  return cameraParam && cameraMap[cameraParam] ? cameraMap[cameraParam] : camera;
+}
+activeCamera = getInitialCamera();
+window.addEventListener("keydown", (event) => {
+  if (event.key === "c" || event.key === "C") {
+    console.log("switching camera");
+    if (activeCamera === camera) {
+      activeCamera = cubeCamera;
+      updateCameraQueryString("cube");
+    } else if (activeCamera === cubeCamera) {
+      activeCamera = spiralCamera;
+      updateCameraQueryString("spiral");
+    } else if (activeCamera === spiralCamera) {
+      activeCamera = orbitingCamera;
+      updateCameraQueryString("orbiting");
+    } else if (activeCamera === orbitingCamera) {
+      activeCamera = topCamera;
+      updateCameraQueryString("top");
+    } else if (activeCamera === topCamera) {
+      activeCamera = cube20Camera;
+      updateCameraQueryString("cube20");
+    } else if (activeCamera === cube20Camera) {
+      activeCamera = cube20Camera2;
+      updateCameraQueryString("cube20_2");
+    } else {
+      activeCamera = camera;
+      updateCameraQueryString("main");
+    }
+  }
+});
+function animate() {
+  requestAnimationFrame(animate);
+  cubeGroup.rotation.y -= 15e-4;
+  const offset = new THREE.Vector3(0, 0, 2);
+  offset.applyQuaternion(targetCube.quaternion);
+  cubeCamera.position.copy(targetCube.position).add(offset);
+  cubeCamera.lookAt(targetCube.position);
+  const spiralOffset = new THREE.Vector3(0, 0, 15);
+  spiralOffset.applyMatrix4(targetCubeForSpiral.matrixWorld);
+  spiralCamera.position.copy(spiralOffset);
+  spiralCamera.lookAt(targetCubeForSpiral.position);
+  orbitAngle += 5e-3;
+  const orbitRadius = 200;
+  const orbitHeight = Math.sin(orbitAngle * 0.5) * 100;
+  orbitingCamera.position.x = Math.cos(orbitAngle) * orbitRadius;
+  orbitingCamera.position.z = Math.sin(orbitAngle) * orbitRadius;
+  orbitingCamera.position.y = orbitHeight;
+  orbitingCamera.lookAt(0, 0, 0);
+  cube20Camera.position.copy(targetCube20.position);
+  cube20Camera.lookAt(0, 0, 0);
+  const directionToCenter = targetCube20_2.position.clone().negate().normalize();
+  const offsetDistance = 20;
+  cube20Camera2.position.copy(targetCube20_2.position).add(directionToCenter.multiplyScalar(-offsetDistance));
+  cube20Camera2.lookAt(0, -8, 0);
+  renderScene.camera = activeCamera;
+  tweenGroup.update();
+  controls.update();
+  composer.render();
+}
+animate();

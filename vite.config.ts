@@ -24,6 +24,7 @@ export default defineConfig({
 	base: '/webflow-ts-dev-env/',
 	build: {
 		// outDir: 'dist',
+		minify: false,
 		rollupOptions: {
 			external: [
 				// structure: how import path looks
