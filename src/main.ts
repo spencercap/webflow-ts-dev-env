@@ -102,15 +102,23 @@ window.addEventListener('DOMContentLoaded', () => {
 
         onEnter: () => {
           workEl.querySelector('.heading-project')?.classList.remove('hidden-down');
+
+          // workEl.classList.add('central');
         },
         onLeave: () => {
           workEl.querySelector('.heading-project')?.classList.add('hidden-up');
+
+          // workEl.classList.remove('central');
         },
         onEnterBack: () => {
           workEl.querySelector('.heading-project')?.classList.remove('hidden-up');
+
+          // workEl.classList.add('central');
         },
         onLeaveBack: () => {
           workEl.querySelector('.heading-project')?.classList.add('hidden-down');
+
+          // workEl.classList.remove('central');
         }
 
       });
@@ -178,6 +186,8 @@ window.addEventListener('DOMContentLoaded', () => {
           videos.forEach((video, _i) => {
             video.play();
           });
+
+          sEl.classList.add('central');
         } else {
           (sEl as any).swiper.autoplay.pause();
     
@@ -186,6 +196,7 @@ window.addEventListener('DOMContentLoaded', () => {
             video.pause();
           });
 
+          sEl.classList.remove('central');
         }
 
       },
