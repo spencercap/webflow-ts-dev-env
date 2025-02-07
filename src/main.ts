@@ -37,6 +37,11 @@ const cameraZoomRange = {
     speed: -0.2  // Controls oscillation speed
 };
 
+// Replace the static color initialization with dynamic HSL color
+const initialHue = (Date.now() % 1000) / 1000; // Convert milliseconds to value between 0-1
+const initialColor = new THREE.Color();
+initialColor.setHSL(initialHue, 1, 0.5);
+
 const params = {
 	a: Math.floor(Math.random() * 10) + 1, // random btwn 10
 	b: Math.floor(Math.random() * 10) + 1, // random btwn 10,
@@ -48,7 +53,7 @@ const params = {
 	tubeRadius: 0.2,
 	radialSegments: 8,
 	// color: 0xff0000,
-	color: 0xc3ff03,
+	color: initialColor.getHex(), // Convert HSL color to hex
 	pixelSize: 40, // Pixel size for shader
 	bloomStrength: 1.5,
 	bloomRadius: 0.4,
@@ -475,7 +480,7 @@ function animate() {
 		updateTubeRadiusGUI();
 
 		// Create a cycling hue value
-		const hue = (time * colorRange.speed) % 1;
+		const hue = initialHue + (time * colorRange.speed) % 1;
 		// Convert HSL to RGB (using helper function)
 		const color = new THREE.Color();
 		color.setHSL(hue, 1, 0.5);

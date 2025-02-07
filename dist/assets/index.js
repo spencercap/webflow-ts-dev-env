@@ -3342,6 +3342,9 @@ const cameraZoomRange = {
   speed: -0.2
   // Controls oscillation speed
 };
+const initialHue = Date.now() % 1e3 / 1e3;
+const initialColor = new THREE.Color();
+initialColor.setHSL(initialHue, 1, 0.5);
 const params = {
   a: Math.floor(Math.random() * 10) + 1,
   // random btwn 10
@@ -3355,7 +3358,8 @@ const params = {
   tubeRadius: 0.2,
   radialSegments: 8,
   // color: 0xff0000,
-  color: 12844803,
+  color: initialColor.getHex(),
+  // Convert HSL color to hex
   pixelSize: 40,
   // Pixel size for shader
   bloomStrength: 1.5,
@@ -3669,7 +3673,7 @@ function animate() {
   if (params.animateValues) {
     params.tubeRadius = tubeRadiusRange.min + (Math.sin(time * tubeRadiusRange.speed) + 1) * 0.5 * (tubeRadiusRange.max - tubeRadiusRange.min);
     updateTubeRadiusGUI();
-    const hue = time * colorRange.speed % 1;
+    const hue = initialHue + time * colorRange.speed % 1;
     const color = new THREE.Color();
     color.setHSL(hue, 1, 0.5);
     params.color = color.getHex();
