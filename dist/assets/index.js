@@ -3342,6 +3342,16 @@ const cameraZoomRange = {
   speed: -0.2
   // Controls oscillation speed
 };
+const mouseHueInfluence = {
+  value: 0,
+  strength: 0.15
+  // How much mouse position affects the hue
+};
+const mouseCameraInfluence = {
+  value: 0,
+  strength: 7
+  // How many units the mouse can move the camera
+};
 const initialHue = Date.now() % 1e3 / 1e3;
 const initialColor = new THREE.Color();
 initialColor.setHSL(initialHue, 1, 0.5);
@@ -3673,7 +3683,7 @@ function animate() {
   if (params.animateValues) {
     params.tubeRadius = tubeRadiusRange.min + (Math.sin(time * tubeRadiusRange.speed) + 1) * 0.5 * (tubeRadiusRange.max - tubeRadiusRange.min);
     updateTubeRadiusGUI();
-    const hue = initialHue + time * colorRange.speed % 1;
+    const hue = (initialHue + time * colorRange.speed + mouseHueInfluence.value) % 1;
     const color = new THREE.Color();
     color.setHSL(hue, 1, 0.5);
     params.color = color.getHex();
@@ -3681,7 +3691,9 @@ function animate() {
     params.bloomStrength = bloomStrengthRange.min + (Math.sin(time * bloomStrengthRange.speed) + 1) * 0.5 * (bloomStrengthRange.max - bloomStrengthRange.min);
     bloomPass.strength = params.bloomStrength;
     updateBloomStrengthGUI();
-    params.cameraDistance = cameraZoomRange.min + (Math.sin((time + 4) * cameraZoomRange.speed) + 1) * 0.5 * (cameraZoomRange.max - cameraZoomRange.min);
+    const oscillation = (Math.sin((time + 4) * cameraZoomRange.speed) + 1) * 0.5;
+    const baseDistance = cameraZoomRange.min + oscillation * (cameraZoomRange.max - cameraZoomRange.min);
+    params.cameraDistance = baseDistance + mouseCameraInfluence.value;
     camera.position.z = params.cameraDistance;
     updateCameraZoomGUI();
   }
@@ -3691,3 +3703,15 @@ function animate() {
   composer.render();
 }
 animate();
+function updateFromPointer(x, y) {
+  mouseHueInfluence.value = (y / window.innerHeight * 2 - 1) * mouseHueInfluence.strength;
+  mouseCameraInfluence.value = (x / window.innerWidth * 2 - 1) * mouseCameraInfluence.strength;
+}
+window.addEventListener("mousemove", (event) => {
+  updateFromPointer(event.clientY, event.clientX);
+});
+window.addEventListener("touchmove", (event) => {
+  if (event.touches.length > 0) {
+    updateFromPointer(event.touches[0].clientY, event.touches[0].clientX);
+  }
+});
