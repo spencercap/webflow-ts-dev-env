@@ -3704,14 +3704,14 @@ function animate() {
 }
 animate();
 function updateFromPointer(x, y) {
-  mouseHueInfluence.value = (y / window.innerHeight * 2 - 1) * mouseHueInfluence.strength;
-  mouseCameraInfluence.value = (x / window.innerWidth * 2 - 1) * mouseCameraInfluence.strength;
+  mouseHueInfluence.value = (x / window.innerWidth * 2 - 1) * mouseHueInfluence.strength;
+  mouseCameraInfluence.value = (y / window.innerHeight * 2 - 1) * mouseCameraInfluence.strength;
 }
 window.addEventListener("mousemove", (event) => {
-  updateFromPointer(event.clientY, event.clientX);
+  updateFromPointer(event.clientX, event.clientY);
 });
 window.addEventListener("touchmove", (event) => {
   if (event.touches.length > 0) {
-    updateFromPointer(event.touches[0].clientY, event.touches[0].clientX);
+    updateFromPointer(event.touches[0].clientX, event.touches[0].clientY);
   }
 });

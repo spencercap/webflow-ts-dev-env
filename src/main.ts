@@ -526,19 +526,19 @@ animate();
 
 // Handle mouse/touch movement
 function updateFromPointer(x: number, y: number) {
-    // Update existing hue influence from Y position
-    mouseHueInfluence.value = (y / window.innerHeight * 2 - 1) * mouseHueInfluence.strength;
+    // Update hue influence from X position (swapped from Y)
+    mouseHueInfluence.value = (x / window.innerWidth * 2 - 1) * mouseHueInfluence.strength;
     
-    // Update camera influence from X position
-    mouseCameraInfluence.value = (x / window.innerWidth * 2 - 1) * mouseCameraInfluence.strength;
+    // Update camera influence from Y position (swapped from X)
+    mouseCameraInfluence.value = (y / window.innerHeight * 2 - 1) * mouseCameraInfluence.strength;
 }
 
 window.addEventListener('mousemove', (event) => {
-    updateFromPointer(event.clientY, event.clientX);
+    updateFromPointer(event.clientX, event.clientY);
 });
 
 window.addEventListener('touchmove', (event) => {
     if (event.touches.length > 0) {
-        updateFromPointer(event.touches[0].clientY, event.touches[0].clientX);
+        updateFromPointer(event.touches[0].clientX, event.touches[0].clientY);
     }
 });
