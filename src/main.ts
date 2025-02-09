@@ -160,48 +160,46 @@ window.addEventListener('DOMContentLoaded', () => {
   // } // end for loop
   
 
+  // give it a sec to init the swipers
+  setTimeout(() => {
 
-  // swiper scroller triggers
-  let swiperEls = document.querySelectorAll(`.swiper`);
+    // swiper scroller triggers
+    let swiperEls = document.querySelectorAll(`.swiper`);
 
-  for (let [, sEl] of swiperEls.entries()) {
-    // console.log('create tirgger', sEl);
-
-    ScrollTrigger.create({
-      trigger: sEl,
-      start: 'top-=5% center', 
-      end: 'bottom+=5% center', 
-      markers: true,
-
-      onToggle: (e) => {
-        // console.log('onToggle', e, sEl);
-
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const sEl = entry.target;
         const videos = sEl.querySelectorAll<HTMLVideoElement>('.swiper-slide video');
         
-        if (e.isActive) {
-          // console.log('workAreaActive', i);
+        if (entry.isIntersecting) {
           (sEl as any).swiper.autoplay.resume();
-
-          // Loop through all videos + PLAY videos ON-screen 
-          videos.forEach((video, _i) => {
+          
+          videos.forEach(video => {
             video.play();
           });
-
+          
           sEl.classList.add('central');
         } else {
           (sEl as any).swiper.autoplay.pause();
-    
-          // Loop through all videos + pause videos off-screen 
-          videos.forEach((video, _i) => {
+          
+          videos.forEach(video => {
             video.pause();
           });
-
+          
           sEl.classList.remove('central');
         }
-
-      },
+      });
+    }, {
+      threshold: 0.84, // Trigger when at least 90% is visible
+      rootMargin: '-60px 0px 0px 0px' // 60px margin from top, 0px for right, bottom, left
     });
-  } // end for loop
+
+    swiperEls.forEach(sEl => {
+      observer.observe(sEl);
+    });
+
+
+  }, 1000);
 
 
   
