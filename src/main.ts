@@ -197,9 +197,72 @@ window.addEventListener('DOMContentLoaded', () => {
       observer.observe(sEl);
     });
 
+    
+
+    // Work wrapper observer
+    const workWrapperObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const parentSection = entry.target.closest('.work-section-wrap');
+          const scrollAnchor = parentSection?.querySelector('.scroll-anchor');
+          const sectionId = scrollAnchor?.id;
+          if (sectionId) {
+            history.replaceState(null, '', `#${sectionId}`);
+          }
+        }
+      });
+    }, {
+      threshold: 0.75,
+      rootMargin: '-60px 0px 0px 0px'
+    });
+
+    // FYI listening to first + last so that we catch hash update on scroll down + back UP on page
+    // Find and observe first and last work-wrapper in each section
+    document.querySelectorAll('.work-section-wrap').forEach(section => {
+      const workWrappers = section.querySelectorAll('.work-wrapper');
+      if (workWrappers.length > 0) {
+        // Always observe first wrapper
+        workWrapperObserver.observe(workWrappers[0]);
+        
+        // If there's more than one wrapper, observe the last one too
+        if (workWrappers.length > 1) {
+          workWrapperObserver.observe(workWrappers[workWrappers.length - 1]);
+        }
+      }
+    });
 
   }, 1000);
 
+
+
+
+
+  
+  // 
+  
+  document.querySelectorAll('.work-type-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+        console.log('link clicked', link);
+        e.preventDefault(); // Prevent default anchor behavior
+        
+        const targetHash = link.getAttribute('href'); // Get href value
+        if (!targetHash) return;
+        const scrollToEl = document.querySelector(targetHash);
+        
+        if (scrollToEl) {
+            // Update URL with hash
+            // window.history.pushState('', '', targetHash);
+            
+            // Scroll element into view
+            setTimeout(() => {
+                console.log('scrollToEl', scrollToEl);
+                scrollToEl.scrollIntoView({ behavior: 'smooth' });
+            }, 2000);
+        }
+    });
+});
+
+  
 
   
 }, false);
