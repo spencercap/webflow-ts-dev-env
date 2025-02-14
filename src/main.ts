@@ -174,9 +174,8 @@ window.addEventListener('DOMContentLoaded', () => {
         if (entry.isIntersecting) {
           (sEl as any).swiper.autoplay.resume();
           
-          videos.forEach(video => {
-            video.play();
-          });
+          // play visible video in stack
+          videos[(sEl as any).swiper.activeIndex].play();
           
           sEl.classList.add('central');
         } else {
