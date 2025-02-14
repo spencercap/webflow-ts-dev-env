@@ -198,9 +198,17 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     
+    // TODO change 84 to dynamic for desktop/mobile header height
+
+    // TODO re-add THIS for better hash changing!
+    // Calculate the margin in pixels
+    // const topMargin = (-0.15 * window.innerHeight); // + 84; // -15vh + 60px
+    // const bottomMargin = -0.15 * window.innerHeight; // -15vh
+    // const rootMarginValue = `${topMargin}px 0px ${bottomMargin}px 0px`;
 
     // Work wrapper observer
     const workWrapperObserver = new IntersectionObserver((entries) => {
+      console.log('workWrapperObserver', entries);
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           const parentSection = entry.target.closest('.work-section-wrap');
@@ -213,7 +221,11 @@ window.addEventListener('DOMContentLoaded', () => {
       });
     }, {
       threshold: 0.75,
-      rootMargin: '-60px 0px 0px 0px'
+      // threshold: 1.0,
+      rootMargin: '-84px 0px 0px 0px'
+      // rootMargin: '-15% 0px 15% 0px'
+      // rootMargin: 'calc(-15svh + 60px) 0px -15svh 0px' // doesnt work
+      // rootMargin: rootMarginValue
     });
 
     // FYI listening to first + last so that we catch hash update on scroll down + back UP on page
@@ -236,6 +248,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
+  // scroll to center
+  // const yOffset = (window.innerHeight - element.getBoundingClientRect().height) / 2;
+  // const y = element.getBoundingClientRect().top + window.scrollY - yOffset;
+  // window.scrollTo({ top: y, behavior: "smooth" });
+
 
   
   // 
@@ -245,22 +262,69 @@ window.addEventListener('DOMContentLoaded', () => {
         console.log('link clicked', link);
         e.preventDefault(); // Prevent default anchor behavior
         
-        const targetHash = link.getAttribute('href'); // Get href value
+        var targetHash = link.getAttribute('href'); // Get href value
         if (!targetHash) return;
+
+        // targetHash = targetHash.slice(0, -2);
+        targetHash = targetHash.split('-area')[0];
+        console.log('targetHash', targetHash);
         const scrollToEl = document.querySelector(targetHash);
         
         if (scrollToEl) {
+          console.log('scrollToEl', scrollToEl);
+          scrollToEl.scrollIntoView({ behavior: "smooth", block: "center" });
+          
             // Update URL with hash
             // window.history.pushState('', '', targetHash);
             
             // Scroll element into view
             setTimeout(() => {
                 console.log('scrollToEl', scrollToEl);
-                scrollToEl.scrollIntoView({ behavior: 'smooth' });
-            }, 2000);
+                // scrollToEl.scrollIntoView({ behavior: 'smooth' });
+                // scrollToEl.scrollIntoView({ behavior: "smooth", block: "center" });
+
+                // const element = scrollToEl;
+                // const yOffset = (window.innerHeight - element.getBoundingClientRect().height) / 2;
+                // const y = element.getBoundingClientRect().top + window.scrollY - yOffset;
+                // window.scrollTo({ top: y, behavior: "smooth" });
+
+            }, 1000);
         }
     });
-});
+  });
+
+
+
+  //
+
+  // Hash change handler for smooth scrolling
+  window.addEventListener('hashchange', (e) => {
+    console.log('hashchange', e);
+    e.preventDefault();
+    const hash = window.location.hash;
+    if (!hash) return;
+    
+    const targetElement = document.querySelector(hash);
+    if (!targetElement) return;
+
+    targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    /*
+    // Calculate 15svh offset
+    const offsetHeight = window.innerHeight * 0.15;
+    
+    // Calculate the final scroll position
+    const elementPosition = targetElement.getBoundingClientRect().top + window.scrollY;
+    const offsetPosition = elementPosition - offsetHeight;
+
+    // Smooth scroll to element
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth'
+    });
+    */
+   
+  });
 
   
 
