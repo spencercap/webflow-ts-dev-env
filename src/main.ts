@@ -216,6 +216,26 @@ window.addEventListener('DOMContentLoaded', () => {
           const sectionId = scrollAnchor?.id;
           if (sectionId) {
             history.replaceState(null, '', `#${sectionId}`);
+
+            // Remove active class from all work-type-links and their children
+            document.querySelectorAll('.work-type-link').forEach(link => {
+              link.classList.remove('active');
+              const directChild = link.querySelector(':scope > *');
+              if (directChild) {
+                directChild.classList.remove('active');
+              }
+            });
+
+            // Find and add active class to matching work-type-link and its child
+            const activeLink = document.querySelector(`.work-type-link[href*="${sectionId}"]`);
+            if (activeLink) {
+              activeLink.classList.add('active');
+              const directChild = activeLink.querySelector(':scope > *');
+              if (directChild) {
+                directChild.classList.add('active');
+              }
+            }
+
           }
         }
       });
