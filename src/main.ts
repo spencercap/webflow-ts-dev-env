@@ -174,6 +174,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (entry.isIntersecting) {
           (sEl as any).swiper.autoplay.resume();
           
+          console.log('do play', sEl);
           // play visible video in stack
           videos[(sEl as any).swiper.activeIndex].play();
           
