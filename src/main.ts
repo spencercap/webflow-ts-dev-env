@@ -170,24 +170,27 @@ window.addEventListener('DOMContentLoaded', () => {
       entries.forEach(entry => {
         const sEl = entry.target;
         const videos = sEl.querySelectorAll<HTMLVideoElement>('.swiper-slide video');
-        
-        if (entry.isIntersecting) {
-          (sEl as any).swiper.autoplay.resume();
-          
-          console.log('do play', sEl);
-          // play visible video in stack
-          videos[(sEl as any).swiper.activeIndex].play();
-          
-          sEl.classList.add('central');
-        } else {
-          (sEl as any).swiper.autoplay.pause();
-          
-          videos.forEach(video => {
-            video.pause();
-          });
-          
-          sEl.classList.remove('central');
+
+        if (sEl && (sEl as any).swiper !== undefined) {
+          if (entry.isIntersecting) {
+            (sEl as any).swiper.autoplay.resume();
+            
+            console.log('do play', sEl);
+            // play visible video in stack
+            videos[(sEl as any).swiper.activeIndex].play();
+            
+            sEl.classList.add('central');
+          } else {
+            (sEl as any).swiper.autoplay.pause();
+            
+            videos.forEach(video => {
+              video.pause();
+            });
+            
+            sEl.classList.remove('central');
+          }
         }
+        
       });
     }, {
       threshold: 0.84, // Trigger when at least 90% is visible
