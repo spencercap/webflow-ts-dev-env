@@ -559,7 +559,8 @@ window.addEventListener('touchmove', (event) => {
 const gltfLoader = new GLTFLoader();
 
 gltfLoader.load(
-  './public/assets/weathered_old_pylon.glb',
+//   './public/assets/weathered_old_pylon.glb',
+  `https://cdn.jsdelivr.net/gh/spencercap/webflow-ts-dev-env@201bc1a9e1edbb8f8732d87ef27c76098cacabf8/dist/assets/weathered_old_pylon.glb`,
   (gltf) => {
     // Success callback
     const model = gltf.scene;
