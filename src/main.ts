@@ -13,6 +13,9 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
 import { GUI } from 'dat.gui';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
 
 const tubeRadiusRange = {
@@ -53,8 +56,8 @@ const initialColor = new THREE.Color();
 initialColor.setHSL(initialHue, 1, 0.5);
 
 const params = {
-	a: Math.floor(Math.random() * 10) + 1, // random btwn 10
-	b: Math.floor(Math.random() * 10) + 1, // random btwn 10,
+	a: 1, // random btwn 10
+	b: 1, // random btwn 10,
 	c: 1,
 	delta: Math.PI / 2,
 	A: 16,
@@ -63,18 +66,21 @@ const params = {
 	tubeRadius: 0.2,
 	radialSegments: 8,
 	// color: 0xff0000,
-	color: initialColor.getHex(), // Convert HSL color to hex
-	pixelSize: 40, // Pixel size for shader
+	color: 0xe68661,
+	// color: initialColor.getHex(), // Convert HSL color to hex
+	pixelSize: 1, // Pixel size for shader
 	bloomStrength: 1.5,
 	bloomRadius: 0.4,
 	bloomThreshold: 0,
 	exposure: 1,
 	backgroundColor: 0x000000,
-	grainAmount: 0.3,
+	grainAmount: 0.75,
 	grainSpeed: 0.2,
-	animateValues: true, // New parameter for animation toggle
+	animateValues: false, // New parameter for animation toggle
 	cameraDistance: 15, // Initial camera distance
 };
+
+var modelRef: THREE.Group | null = null;
 
 // Initialize the scene, camera, and renderer
 const scene = new THREE.Scene();
@@ -172,7 +178,7 @@ svgGroup.position.set(-9, 3, 0); // Center position
 const ambientLight = new THREE.AmbientLight(0x404040, 1);
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 25);
 directionalLight.position.set(10, 10, 10);
 scene.add(directionalLight);
 
@@ -280,7 +286,7 @@ const bloomPass = new UnrealBloomPass(
 	params.bloomRadius,
 	params.bloomThreshold
 );
-composer.addPass(bloomPass);
+// composer.addPass(bloomPass);
 
 // Add this after your existing shader definitions
 const GrainShader = {
@@ -328,7 +334,7 @@ grainPass.uniforms.speed.value = params.grainSpeed;
 // --- GUI ---
 
 // GUI for interactive parameters
-const parentElement = document.querySelector('.bodyreal'); // Your parent element
+// const parentElement = document.querySelector('.bodyreal'); // Your parent element
 // console.log('parentElement', parentElement);
 let gui: GUI | undefined;
 gui = new GUI();
@@ -338,7 +344,7 @@ guiElement.style.zIndex = '9999';
 guiElement.style.position = 'fixed';
 guiElement.style.top = '50px';
 guiElement.style.right = '0px';
-parentElement!.appendChild(gui.domElement);
+// parentElement!.appendChild(gui.domElement);
 
 // Add all your existing GUI controls
 gui.add(params, 'a', 1, 10, 1).onChange(updateLissajousCurve);
@@ -384,7 +390,7 @@ gui.addColor(params, 'backgroundColor').onChange(function (value) {
 	(scene as any).background.set(value);
 }).name('BG Color');
 
-gui.add(params, 'grainAmount', 0, 0.5).onChange(function (value) {
+gui.add(params, 'grainAmount', 0, 2.5).onChange(function (value) {
 	grainPass.uniforms.amount.value = value;
 }).name('Grain Amount');
 
@@ -471,9 +477,9 @@ window.addEventListener('DOMContentLoaded', () => {
 	console.log('DOM loaded');
 
 	// init pixel size based on screen width (mobile, they are chunkier)
-	let pxVal = Math.min(42, Math.floor(window.innerWidth / 22));
-	params.pixelSize = pxVal;
-	pixelPass.uniforms['pixelSize'].value = pxVal;
+	// let pxVal = Math.min(42, Math.floor(window.innerWidth / 22));
+	// params.pixelSize = pxVal;
+	// pixelPass.uniforms['pixelSize'].value = pxVal;
 
 }, false);
 
@@ -484,6 +490,13 @@ function animate() {
 	requestAnimationFrame(animate);
 	time += 0.01;
 	grainPass.uniforms.time.value = time;
+
+
+	// Rotate the model counter-clockwise (if loaded)
+	if (modelRef) {
+		modelRef.rotation.y += 0.008; // Negative value for counter-clockwise
+	}
+	
 
 	if (params.animateValues) {  // Only animate if enabled
 		params.tubeRadius = tubeRadiusRange.min + (Math.sin(time * tubeRadiusRange.speed) + 1) * 0.5 * (tubeRadiusRange.max - tubeRadiusRange.min);
@@ -542,3 +555,130 @@ window.addEventListener('touchmove', (event) => {
         updateFromPointer(event.touches[0].clientX, event.touches[0].clientY);
     }
 });
+// Load GLB model
+const gltfLoader = new GLTFLoader();
+
+gltfLoader.load(
+  './public/assets/weathered_old_pylon.glb',
+  (gltf) => {
+    // Success callback
+    const model = gltf.scene;
+    
+    // Scale and position the model as needed
+    let mScale = 50;
+    model.scale.set(mScale, mScale, mScale);
+    model.position.set(0, -7, 0);
+    
+    // Store reference to the model for animation
+    modelRef = model;
+	console.log('modelRef', modelRef);
+	(window as any).modelRef = modelRef;
+    
+    // Add the model to the scene
+    scene.add(model);
+    
+    // Optional: traverse the model to modify materials
+    model.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        // const mesh = child as THREE.Mesh;
+        // Modify materials if needed
+        // mesh.material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+      }
+    });
+    
+    console.log('GLB model loaded successfully');
+  },
+  (progress) => {
+    // Progress callback
+    console.log('Loading progress: ', (progress.loaded / progress.total) * 100, '%');
+  },
+  (error) => {
+    // Error callback
+    console.error('Error loading GLB model:', error);
+  }
+);
+
+// Add this after the lighting setup
+// Load font and create 3D text
+const fontLoader = new FontLoader();
+fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (font) => {
+  // Create a group to hold all text characters
+  const textGroup = new THREE.Group();
+  scene.add(textGroup);
+  
+  // Text settings
+  const text = `WATCH OUT                 `;
+  const textMaterial = new THREE.MeshStandardMaterial({ 
+    color: 0xffffff,
+    metalness: 0.9,       // Full metalness for chrome effect
+    roughness: 0.2,       // Low roughness for high shine
+    envMapIntensity: 1.5, // Enhance environment reflections
+  });
+  
+  // Create each letter as a separate mesh
+//   const letterSpacing = 0.8;
+  const radius = 4;
+  const height = 5;
+  
+  // Place each letter in an arc around the Y axis
+  for (let i = 0; i < text.length; i++) {
+    const letter = text[i];
+    
+    // Create text geometry for this letter
+    const textGeometry = new TextGeometry(letter, {
+      font: font,
+      size: 0.8,
+      height: 0.2,
+      curveSegments: 12,
+      bevelEnabled: true,
+      bevelThickness: 0.1,
+      bevelSize: 0.2,
+      bevelOffset: 0,
+      bevelSegments: 5
+    });
+    
+    // Center the letter geometry
+    // textGeometry.computeBoundingBox();
+    // if (textGeometry.boundingBox) {
+    //   const centerOffset = -0.5 * (textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x);
+    // }
+    
+    // Create mesh for this letter
+    const letterMesh = new THREE.Mesh(textGeometry, textMaterial);
+    // Position in a circle around Y axis
+    const angle = (i / text.length) * Math.PI * 2;
+    letterMesh.position.x = Math.sin(angle) * radius;
+    letterMesh.position.z = Math.cos(angle) * radius;
+    letterMesh.position.y = height;
+    
+    // Rotate to face center + additional 90 degrees on Y axis
+    letterMesh.rotation.y = -Math.PI / 2 + angle + Math.PI / 2; // Added Math.PI/2 (90 degrees)
+    
+    // Add to group
+    textGroup.add(letterMesh);
+  }
+  
+  // Add animation for the text group in the animate function
+  const animateText = () => {
+    textGroup.rotation.y -= 0.02; // Rotate around Y axis
+    requestAnimationFrame(animateText);
+  };
+  
+  animateText();
+});
+
+// Add an environment map for reflections if not already present
+if (!scene.environment) {
+  const pmremGenerator = new THREE.PMREMGenerator(renderer);
+  pmremGenerator.compileEquirectangularShader();
+  
+  // Create a simple environment for reflection
+  const cubeRenderTarget = pmremGenerator.fromScene(new THREE.Scene());
+  scene.environment = cubeRenderTarget.texture;
+}
+
+// Add a directional light specifically to enhance the chrome reflections
+const chromeLight = new THREE.DirectionalLight(0xffffff, 2);
+chromeLight.position.set(5, 10, 7);
+scene.add(chromeLight);
+
