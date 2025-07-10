@@ -327,6 +327,8 @@ window.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     const hash = window.location.hash;
     if (!hash) return;
+
+    // FYI the new REEL btn in the bottom left mini nav is handled with a new .scroll-achor-REEL el within the home animation els
     
     const targetElement = document.querySelector(hash);
     if (!targetElement) return;
