@@ -210,6 +210,8 @@ window.addEventListener('DOMContentLoaded', () => {
     // const bottomMargin = -0.15 * window.innerHeight; // -15vh
     // const rootMarginValue = `${topMargin}px 0px ${bottomMargin}px 0px`;
 
+    const bottomRightArrowEl = document.querySelector('.diagonal-arr-btn');
+
     // Work wrapper observer
     const workWrapperObserver = new IntersectionObserver((entries) => {
       console.log('workWrapperObserver', entries);
@@ -240,6 +242,20 @@ window.addEventListener('DOMContentLoaded', () => {
               }
             }
 
+            // flip bottom right arrow if at END (last element of short-films)
+            if (sectionId === 'short-films' && parentSection?.lastElementChild === entry.target) {
+              bottomRightArrowEl?.classList.add('flipped');
+            }
+
+            // Remove flipped class when scrolling back up to second-to-last element
+            const workWrappers = parentSection?.querySelectorAll('.work-wrapper');
+            if (sectionId === 'short-films' && workWrappers && workWrappers.length > 1) {
+              const secondToLast = workWrappers[workWrappers.length - 2];
+              if (entry.target === secondToLast) {
+                bottomRightArrowEl?.classList.remove('flipped');
+              }
+            }
+
           }
         }
       });
@@ -253,16 +269,22 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     // FYI listening to first + last so that we catch hash update on scroll down + back UP on page
-    // Find and observe first and last work-wrapper in each section
+    // Find and observe first, second-to-last, and last work-wrapper in each section
     document.querySelectorAll('.work-section-wrap').forEach(section => {
       const workWrappers = section.querySelectorAll('.work-wrapper');
       if (workWrappers.length > 0) {
         // Always observe first wrapper
         workWrapperObserver.observe(workWrappers[0]);
         
-        // If there's more than one wrapper, observe the last one too
+        // If there's more than one wrapper, observe the last one
         if (workWrappers.length > 1) {
           workWrapperObserver.observe(workWrappers[workWrappers.length - 1]);
+          
+          // Also observe second-to-last for short-films section (to handle flipped class removal)
+          const scrollAnchor = section.querySelector('.scroll-anchor');
+          if (scrollAnchor?.id === 'short-films' && workWrappers.length > 2) {
+            workWrapperObserver.observe(workWrappers[workWrappers.length - 2]);
+          }
         }
       }
     });
