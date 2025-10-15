@@ -1,0 +1,220 @@
+<dialog id="dialogReel" tabindex="-1">
+  <button class="dialog-close" aria-label="Close video">✕</button>
+	<div style="">
+  	<iframe 
+    	id="vimeoIframeReel"
+    	src="https://player.vimeo.com/video/992393276?h=b1e3c7fc28&autoplay=1&muted=1" 
+      frameborder="0" 
+      allow="autoplay; fullscreen; picture-in-picture; clipboard-write" 
+      style="position:absolute;top:0;left:0;width:100%;height:100%;" 
+      title="Director Reel"></iframe>
+  </div>
+</dialog>
+
+<style>
+/*   Open state of the dialog  */
+dialog[open] {
+  opacity: 1;
+  
+  aspect-ratio: 16 / 9;
+}
+
+/*   Closed state of the dialog   */
+dialog {
+  opacity: 0;
+  background: #000;
+  width: calc(100% - 10px); 
+  max-width: 800px; 
+  padding: 0; 
+  border: none;
+  aspect-ratio: 0;
+  outline: none;
+  
+  transition:
+    opacity 0.7s ease-out,
+    transform 0.7s ease-out,
+    overlay 0.7s ease-out allow-discrete,
+    display 0.7s ease-out allow-discrete;
+  /* Equivalent to
+  transition: all 0.7s allow-discrete; */
+}
+
+#dialogReel {
+	max-height: 90svh;
+	/* 
+  aspect-ratio: 16 / 9;
+  */
+}
+
+/* below css fixes mobile ios close flicker */
+dialog > div {
+	position: relative;
+
+	opacity: 0;
+  width: 0;
+  height: 0;
+	padding: 0;
+}
+dialog[open] > div {
+	opacity: 1;
+  width: initial;
+  height: initial;
+  padding: 56.25% 0 0 0; 
+}
+
+/*   Before-open state  */
+/* Needs to be after the previous dialog[open] rule to take effect,
+    as the specificity is the same */
+@starting-style {
+  dialog[open] {
+    opacity: 0;
+  }
+}
+
+/* Transition the :backdrop when the dialog modal is promoted to the top layer */
+dialog::backdrop {
+  background-color: rgb(0 0 0 / 0%);
+  transition:
+    display 0.7s allow-discrete,
+    overlay 0.7s allow-discrete,
+    background-color 0.7s;
+  /* Equivalent to
+  transition: all 0.7s allow-discrete; */
+}
+
+dialog[open]::backdrop {
+  background-color: rgb(0 0 0 / 90%);
+}
+
+/* This starting-style rule cannot be nested inside the above selector
+because the nesting selector cannot represent pseudo-elements. */
+
+@starting-style {
+  dialog[open]::backdrop {
+    background-color: rgb(0 0 0 / 0%);
+  }
+}
+
+.dialog-close {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    margin: 0.5rem;;
+
+    z-index: 1000;
+    background: none;
+    border: none;
+    margin: 10px;
+    color: #fff;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    
+    opacity: 0.5;
+    transition: opacity 0.3s ease-out;
+}
+.dialog-close:hover {
+    opacity: 0.85;
+}
+</style>
+<style>
+.cta-reel-wrap .w-background-video > video {
+  object-fit: contain;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+</style>
+
+<script src="https://player.vimeo.com/api/player.js"></script>
+<script>
+// === init Elements & Vimeo player ===
+const dialogElem = document.getElementById("dialogReel");
+const showBtn = document.querySelector(".cta-reel-trigger");
+const vIframe = document.getElementById("vimeoIframeReel");
+const vimeoPlayer = new Vimeo.Player(vIframe);
+
+// Make dialog focusable so it can receive keyboard events
+if (!dialogElem.hasAttribute('tabindex')) {
+  dialogElem.setAttribute('tabindex', '-1');
+}
+
+// Optional: ensure iframe is focusable by mouse but not by keyboard tab (avoid accidental tab stops)
+// vIframe.setAttribute('tabindex', '-1'); // uncomment if you want iframe skipped by tabbing
+
+// Ensure video starts paused
+vimeoPlayer.pause();
+
+
+// === Helper: close modal and pause video ===
+function closeModal() {
+  // Pause video first so audio doesn't continue
+  vimeoPlayer.pause();
+
+  // Close the <dialog>
+  if (dialogElem.open) {
+    dialogElem.close();
+  }
+}
+
+
+// === Background (overlay) click handling ===
+// If user clicks outside the dialog content area, close the dialog
+dialogElem.addEventListener('click', (event) => {
+  const rect = dialogElem.getBoundingClientRect();
+  const isInDialog =
+    rect.top <= event.clientY &&
+    event.clientY <= rect.top + rect.height &&
+    rect.left <= event.clientX &&
+    event.clientX <= rect.left + rect.width;
+
+  if (!isInDialog) {
+    closeModal();
+  }
+});
+
+
+// === Open modal / play video ===
+showBtn.addEventListener("click", () => {
+  dialogElem.showModal();
+
+  // Move keyboard focus into the dialog so it receives key events (important when iframe exists)
+  // Putting focus on the dialog itself is simplest; you may instead focus a close button for better UX.
+  dialogElem.focus();
+
+  // Play and set volume
+  vimeoPlayer.play();
+  vimeoPlayer.setVolume(1);
+});
+
+
+// === Close button (recommended) ===
+// If you have an explicit close button inside the dialog, wire it up.
+// If your HTML already contains a .dialog-close button, this will attach behaviour.
+const existingCloseBtn = dialogElem.querySelector('.dialog-close');
+if (existingCloseBtn) {
+  existingCloseBtn.addEventListener('click', closeModal);
+}
+
+
+// === Keyboard handling: Escape key ===
+// Primary listener on the dialog element (works if dialog has focus)
+dialogElem.addEventListener('keydown', (event) => {
+  const key = event.key || event.keyIdentifier || event.code;
+  if (key === 'Escape' || key === 'Esc') {
+    event.preventDefault();
+    closeModal();
+  }
+});
+
+// Fallback: document-level listener (capture phase) — may not fire if iframe has focus,
+// but helpful in many cases. Keep it lightweight.
+document.addEventListener('keydown', (event) => {
+  if ((event.key === 'Escape' || event.key === 'Esc') && dialogElem.open) {
+    event.preventDefault();
+    closeModal();
+  }
+}, true); // use capture to try to catch early
+</script>
