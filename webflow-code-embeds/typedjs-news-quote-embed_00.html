@@ -1,0 +1,101 @@
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      var sentences = [];
+      document.querySelectorAll(".typed-sentence").forEach(function(el) {
+          //sentences.push(el.innerText); // Collect CMS sentences
+          sentences.push({
+          	str: el.innerText, 
+            newsLink: el.getAttribute('data-news-link'),
+            quoteSource: el.getAttribute('data-quote-source') || ''
+          });
+      });
+      console.log('sentences', sentences);
+      
+      const s2 = sentences.map(s => {
+				return `${s.str}`;
+      });
+      console.log(s2);
+
+      new Typed(".typed-output", {
+          //strings: sentences.map(s => s.str),  // Use collected sentences
+          strings: s2,
+          typeSpeed: 20,
+          backSpeed: 15,
+          loop: true,
+          backDelay: 3000, // ms
+          //showCursor: false,
+          
+          smartBackspace: true,
+          shuffle: false,
+          
+        	preStringTyped: (strPos, self) => { 
+            console.log('preStringTyped', strPos, self); 
+            
+            let strIdx = strPos - 1;
+            //console.log(strIdx);
+            //console.log(self); // can also use self.arrayPos
+            
+            console.log('sentences[strIdx]', sentences[strIdx]);
+            let activeSlug = sentences[strIdx].newsLink;
+            let activeUrl = `/post/${activeSlug}`;
+            console.log('activeUrl', activeUrl);
+            
+						let quoteLinkEl = document.querySelector('.quote-link');
+            if (quoteLinkEl) {
+            	if (activeSlug) {
+              	quoteLinkEl.setAttribute('href', activeUrl);
+              } else {
+              	quoteLinkEl.setAttribute('href', '#');
+              }
+            }
+            
+            // set source attribution
+            let activeQuoteSource = sentences[strIdx].quoteSource;
+            let sourceEl = document.querySelector('.quote-source');
+            sourceEl.innerText = activeQuoteSource;
+            console.log('activeQuoteSource', activeQuoteSource);
+            
+          },
+          
+          // callback on complete
+          /*
+	        onComplete: function(self) { 
+          	console.log('onComplete', self);
+          },
+          */
+        
+	        onStringTyped: function(arrayPos, self) { 
+          	console.log('onStringTyped', arrayPos, self);
+
+						let sourceEl = document.querySelector('.quote-source');
+            
+            setTimeout(() => {
+            	// show source
+              sourceEl.classList.add('visible');
+              
+              // hide before next typed sentence
+              setTimeout(() => {
+                sourceEl.classList.remove('visible');
+              }, 2600);
+              
+            }, 300);
+          },
+
+          
+          // how-to: custom colors
+          // strings: ["Hello <span style='color:red'>world</span>"];
+          
+          /*
+          onBegin: (self) => {
+          	console.log('onBegin typed');
+            
+            console.log(self);
+            console.log(this);
+            console.log(this.elContent);
+            
+            //let idx = this.elContent
+          }
+          */
+      });
+  });
+</script>
