@@ -175,7 +175,7 @@ window.addEventListener('DOMContentLoaded', () => {
           if (entry.isIntersecting) {
             (sEl as any).swiper.autoplay.resume();
             
-            console.log('do play', sEl);
+            //console.log('do play', sEl);
             // play visible video in stack
             videos[(sEl as any).swiper.activeIndex].play();
             
@@ -214,7 +214,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Work wrapper observer
     const workWrapperObserver = new IntersectionObserver((entries) => {
-      console.log('workWrapperObserver', entries);
+      //console.log('workWrapperObserver', entries);
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           const parentSection = entry.target.closest('.work-section-wrap');
