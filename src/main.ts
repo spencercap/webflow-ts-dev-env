@@ -347,10 +347,16 @@ window.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('hashchange', (e) => {
     console.log('hashchange', e);
     e.preventDefault();
-    const hash = window.location.hash;
+    let hash = window.location.hash;
     if (!hash) return;
+    console.debug('hash', hash);
 
     // FYI the new REEL btn in the bottom left mini nav is handled with a new .scroll-achor-REEL el within the home animation els
+
+    if (hash === '#reel') {
+      console.log('catch #reel');
+      hash = '#reel-area';
+    }
     
     const targetElement = document.querySelector(hash);
     if (!targetElement) return;

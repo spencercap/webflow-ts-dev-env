@@ -1,0 +1,218 @@
+<script>
+	window.FinsweetAttributes ||= [];
+	window.FinsweetAttributes.push([
+	'list',
+	(listInstances) => {
+		if (!listInstances?.length) return console.warn('No list instances found');
+	
+		const worksList = listInstances[0];
+		const items = worksList.items?.value || [];
+	
+		// Create a Map: category -> DOM element
+		const sectionMap = new Map([
+			['TV Show', document.getElementById('wsection_tv')],
+			['Music & Dance', document.getElementById('wsection_music-dance')],
+			['Short Film', document.getElementById('wsection_short-films')],
+		]);
+	
+		const workWrapperTemplate = document.querySelector('.work-wrapper'); // 1st on in DOM
+	
+		// Create a Map to group TV Show episodes by show-ref
+		const showEpsMap = new Map();
+	
+		for (const item of items) {
+			const el = item.element;
+			const category = el.getAttribute('sc-wt') || '';
+			const sectionEl = sectionMap.get(category);
+	
+			if (category === 'TV Show') {
+				// FYI in JS ref is cms item slug ("ftwd")
+				const showRef = el.getAttribute('sc-show-ref') || 'unknown';
+	
+				// Initialize if not exists
+				if (!showEpsMap.has(showRef)) {
+					showEpsMap.set(showRef, {
+						title: null, // title can be populated later if needed
+						episodes: []
+					});
+				}
+	
+				// Add this episode to the correct group
+				showEpsMap.get(showRef).episodes.push(el);
+			} else {
+				// FYI ELSE is for Music & Dance and Short Film
+	
+				// wrap (diagonal)
+				const workWrapper = workWrapperTemplate.cloneNode(true);
+				
+				// GET changable els
+				const reworkLink = workWrapper.querySelector('.rework-link');
+				const workCardTitle = workWrapper.querySelector('.work-card-title');
+				const reworkVid = workWrapper.querySelector('.rework-vid'); // data-src-txt
+				const reworkStill = workWrapper.querySelector('.rework-still');
+				const workTapArea = workWrapper.querySelector('.work-tap-area');
+				
+				// SET
+				reworkLink.setAttribute('href', `/work/${el.getAttribute('sc-work-ref')}`);
+				workTapArea.setAttribute('href', `/work/${el.getAttribute('sc-work-ref')}`);
+				workCardTitle.textContent = el.getAttribute('sc-work-title');
+				//let wTypeText = el.getAttribute('sc-work-type-text');
+				//if (wTypeText) workCardTitle.textContent += ` (${wTypeText})`;
+				let stillEl = el.querySelector('.rework-still');
+				let stillSrc = stillEl.getAttribute('src');
+				reworkStill.setAttribute('src', stillSrc);
+				reworkStill.removeAttribute('srcset');
+				reworkVid.setAttribute('data-src-txt', el.getAttribute('sc-preview-vid'));
+				reworkVid.setAttribute('poster', stillSrc);
+	
+				if (sectionEl) sectionEl.appendChild(workWrapper);
+			}
+	
+			if (sectionEl) {
+				//sectionEl.appendChild(el);
+			} else {
+				console.warn(`No section found for category: "${category}"`, el);
+			}
+	
+		}
+	
+	
+	
+	
+	
+		// NOW do TV Shows last after sorted loop
+		for (const [showRef, showData] of showEpsMap) {
+			// wrap (diagonal)
+			const workWrapper = workWrapperTemplate.cloneNode(true);
+			
+			// GET 
+			const reworkLink = workWrapper.querySelector('.rework-link');
+			const workCardTitle = workWrapper.querySelector('.work-card-title');
+			// SET 
+			reworkLink.setAttribute('href', `/show/${showData.episodes[0].getAttribute('sc-show-ref')}`);
+			workCardTitle.textContent = showData.episodes[0].getAttribute('sc-show-title');
+	
+			// GET
+			const swiperWrapper = workWrapper.querySelector('.swiper-wrapper');
+			const swiperSlideTemplate = workWrapper.querySelector('.swiper-slide');
+			swiperWrapper.replaceChildren([]); // clear out
+	
+			for (const episode of showData.episodes) {
+				const swiperSlide = swiperSlideTemplate.cloneNode(true);
+	
+				// GET
+				const reworkVid = swiperSlide.querySelector('.rework-vid'); // data-src-txt
+				const reworkStill = swiperSlide.querySelector('.rework-still');
+				const workTapArea = swiperSlide.querySelector('.work-tap-area');
+	
+				// SET
+				workTapArea.setAttribute('href', `/show/${episode.getAttribute('sc-show-ref')}`);
+				let stillEl = episode.querySelector('.rework-still');
+				let stillSrc = stillEl.getAttribute('src');
+				reworkStill.setAttribute('src', stillSrc);
+				reworkStill.removeAttribute('srcset');
+				reworkVid.setAttribute('data-src-txt', episode.getAttribute('sc-preview-vid'));
+				reworkVid.setAttribute('poster', stillSrc);
+	
+				swiperWrapper.appendChild(swiperSlide);
+			}
+	
+			let showWorkTarget = document.querySelector(`.show-work-target[sc-show-slug=${showRef}]`);
+			if (showWorkTarget) showWorkTarget.appendChild(workWrapper);
+			
+		}
+		
+		// Hide placeholder elements
+		const placeholderElements = document.querySelectorAll('.show-work-placeholder, .work-section-heading-placeholder, .custom-cms-list-helpers');
+		placeholderElements.forEach(el => {
+			el.style.display = 'none';
+		});
+	
+			
+		console.log('sectionMap', sectionMap);
+		console.log('episodeMap', showEpsMap);
+	
+		if (window.initSwipers) window.initSwipers();
+		if (window.loadVideosFromTxt) window.loadVideosFromTxt();
+		if (window.initDiagonalArrowClick) window.initDiagonalArrowClick();
+	
+	
+		var Webflow = Webflow || [];
+		Webflow.push(function() {
+			// reinit defined interactions
+			console.log('re-init ix2');
+			Webflow.require('ix2').init();
+		});
+		
+		setTimeout(() => {
+		  console.log('init ix2');
+		  if (Webflow && Webflow.require) {
+				Webflow.require('ix2').init(); // helps diagonal stack interactions      
+		  } else {
+			  console.warn('Webflow require not ready');
+		  }
+		}, 200);
+			
+	} // END attrs
+	]);
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+	let pHome = document.querySelector('.p_home');
+	let pHomeH = pHome?.scrollHeight || 800; // init default
+
+	const urlParams = new URLSearchParams(window.location.search);
+	const currentHash = window.location.hash; // Store the initial hash
+	console.log('currentHash', currentHash);
+
+	if (urlParams.get("from") === "work") {
+		if (currentHash) {
+		
+			let scrollToEl = document.querySelector(currentHash);
+
+			setTimeout(() => {
+				//window.scrollTo({ top: pHomeH + 1, behavior: "instant" });
+				//scrollToEl.scrollIntoView();
+				scrollToEl.scrollIntoView({ behavior: "smooth", block: "center" });
+			
+				// FYI 200ms help intiial page load to have time to load heights + webflow interactions THEN center relavent section
+			}, 200);
+		
+		} else {
+			setTimeout(() => {
+				//window.scrollTo({ top: pHomeH + 1, behavior: "instant" });
+
+				// scroll to top of Works section on homepage 
+				let scrollToEl = document.querySelector('#tv'); 
+				scrollToEl.scrollIntoView({ behavior: "smooth", block: "center" });
+			}, 100);
+		}
+		
+		history.replaceState(null, "Work", `/work${currentHash}`); // Preserve the hash
+	} else {
+		setTimeout(() => {
+			window.scrollTo({ top: pHomeH + 1, behavior: "instant" });
+		}, 1);
+	}
+	
+	if (currentHash == '#reel') {
+		// scroll to reel (same as navbar btn click solution)
+		/*
+		let pHome = document.querySelector('.p_home');
+		let pHomeH = pHome?.scrollHeight || 800; // init default
+
+		window.scrollTo({
+			top: pHomeH + 1,
+			behavior: 'smooth'
+		});
+		*/
+	
+		const viewportHeight = document.documentElement.clientHeight;
+		window.scrollTo({
+			top: viewportHeight * 3.3, // 330vh converted to pixels
+			behavior: 'smooth'
+		});
+
+	}
+});
+</script>

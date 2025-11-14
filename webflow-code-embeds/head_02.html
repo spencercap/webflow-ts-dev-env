@@ -1,0 +1,476 @@
+<script type="importmap">
+{
+  "imports": {
+	"gsap": "https://cdn.jsdelivr.net/npm/gsap@3.12.5/+esm",
+	"gsap/ScrollTrigger": "https://cdn.jsdelivr.net/npm/gsap@3.12.5/ScrollTrigger/+esm"
+  }
+}
+</script>
+<script 
+	defer 
+	crossorigin 
+	type="module" 
+	xxsrc="https://localhost:5173/src/main.ts"
+	xsrc="https://localhost:4173/assets/index-0daCd9Ym.js"
+	src="https://cdn.jsdelivr.net/gh/spencercap/webflow-ts-dev-env@f5c843d0570437a804e20cbd542cd03fe97ccba0/dist/assets/index.js">
+</script>
+<script>
+	window.initDiagonalArrowClick = () => {
+		// where to scroll listener
+		const elements = document.querySelectorAll('.work-wrapper');
+		let visibleIndex = -1;
+
+		// Keep track of which elements are currently visible
+		const visibilityMap = new Map();
+
+		const observer = new IntersectionObserver((entries) => {
+
+			entries.forEach(entry => {
+				const index = Array.from(elements).indexOf(entry.target);
+
+				if (entry.isIntersecting) {
+					visibilityMap.set(index, entry.intersectionRatio);
+				} else {
+					visibilityMap.delete(index);
+				}
+			});
+
+			if (visibilityMap.size > 0) {
+				// Get the most visible element (highest ratio)
+				const mostVisible = [...visibilityMap.entries()].sort((a, b) => b[1] - a[1])[0];
+				visibleIndex = mostVisible[0];
+			} else {
+				visibleIndex = -1;
+			}
+
+			//console.log('Visible work-wrapper index:', visibleIndex);
+		}, {
+			threshold: 0.69
+		});
+
+		elements.forEach(el => observer.observe(el));
+
+
+		let daBtn = document.querySelector('.diagonal-arr-btn');
+		daBtn.addEventListener('click', () => {
+			//console.log('diagonalBtn clicked');
+
+			let scrollToIdx = visibleIndex + 1;
+			console.log('scrollToIdx', scrollToIdx);
+
+
+
+			// scroll to top if at bottom
+			if (scrollToIdx == elements.length || scrollToIdx == 0) {
+				// FYI idx 1 because of the work-wrapper TEMPLATE (hidden)
+
+				//scrollToIdx = 0;
+				scrollToIdx = 1;
+			}
+
+			let scrollToEl = elements[scrollToIdx];
+			scrollToEl.scrollIntoView({ behavior: "smooth", block: "center" });
+
+			/*
+		if (visibleIndex == -1) {	
+			console.log('something different?');
+		} else {
+			let scrollToIdx = visibleIndex + 1;
+			console.log('scrollToIdx', scrollToIdx);
+			let scrollToEl = elements[scrollToIdx];
+		  scrollToEl.scrollIntoView({ behavior: "smooth", block: "center" });
+		}
+		*/
+		}, false);
+	} // END
+</script>
+
+<script>
+	document.addEventListener("DOMContentLoaded", (event) => {
+
+		let videoPlayThruCount = 0;
+		document.querySelector('#bino-video > video').addEventListener('ended', function () {
+			console.count('video loop restart');
+
+			if (videoPlayThruCount < 3) {
+				videoPlayThruCount++;
+				this.play();
+			}
+
+		}); // listeners
+
+
+
+		// for when a user simply taps the title card, scroll for them
+		//document.querySelector('.title-card-wrap').addEventListener('click', (e) => {
+		document.querySelector('.section_reel-trigger-wrap').addEventListener('click', (e) => {
+
+			console.log('.section_reel-trigger-wrap click');
+			//e.preventDefault();
+
+			const viewportHeight = document.documentElement.clientHeight;
+			window.scrollTo({
+				top: viewportHeight * 3.3, // 330vh converted to pixels
+				behavior: 'smooth'
+			});
+		});
+
+
+		const navWorkLink = document.querySelector('#nav-link-work');
+
+		// Create the Intersection Observer
+		const observer = new IntersectionObserver((entries) => {
+			entries.forEach(entry => {
+				const currentHash = window.location.hash;
+
+				if (entry.isIntersecting) {
+					// Element is visible in viewport
+					//window.history.pushState('', "Home", "/" + currentHash);
+					window.history.pushState('', 'Home', '/');
+					document.title = 'Home – Heather Cappiello';
+					navWorkLink.classList.remove('w--current');
+				} else {
+					// Element is not visible in viewport
+					window.history.pushState('', 'Work', '/work' + currentHash);
+					document.title = 'Work – Heather Cappiello';
+					navWorkLink.classList.add('w--current');
+				}
+			});
+		}, {
+			// Observer options - adjust threshold as needed
+			threshold: 0  // Trigger as soon as even 1px is visible/invisible
+		});
+
+		// Start observing the element
+		const targetElement = document.querySelector('.p_home');
+		if (targetElement) {
+			observer.observe(targetElement);
+		}
+
+
+        // const reelAreaWrap = document.querySelector('#reel-area-wrap');
+        // if (reelAreaWrap) {
+        //     observer.observe(reelAreaWrap);
+        // }
+
+	});
+</script>
+
+<!-- Finsweet Attributes -->
+<script async type="module" src="https://cdn.jsdelivr.net/npm/@finsweet/attributes@2/attributes.js" fs-list></script>
+
+<!-- videos in CMS shim -->
+<script>
+	window.loadVideosFromTxt = () => {
+		console.log('loadVideosFromTxt');
+
+		const videos = document.querySelectorAll(".rework-vid.video-txt-src");
+		console.log('videos', videos);
+		const loadStart = performance.now(); // Start total operation timer
+
+		let totalVideos = videos.length;
+		let videosLoaded = 0;
+
+		console.log("Starting to load videos...");
+
+		videos.forEach((video, vIdx) => {
+			var txtFileUrl = video.getAttribute("data-src-txt");
+
+			if (txtFileUrl) {
+				const videoLoadStart = performance.now(); // Start individual video load timer
+
+				// quick CMS test
+				if (txtFileUrl == 'CUSTOM') {
+					let foundAttr = video.querySelector('div[data-cms-vid-as-txt]').getAttribute('data-cms-vid-as-txt');
+					console.log('foundAttr', foundAttr);
+					txtFileUrl = foundAttr;
+				}
+
+				fetch(txtFileUrl)
+					.then(response => {
+						if (!response.ok) {
+							throw new Error(`HTTP error! Status: ${response.status}`);
+						}
+						return response.blob(); // Get the content as a Blob
+					})
+					.then(blob => {
+						const videoBlob = new Blob([blob], { type: "video/mp4" });
+						const videoUrl = URL.createObjectURL(videoBlob);
+						video.src = videoUrl;
+
+						const videoLoadEnd = performance.now(); // End individual video load timer
+						console.log(
+							`Loaded video from ${txtFileUrl} in ${(videoLoadEnd - videoLoadStart).toFixed(2)} ms`
+						);
+
+						// LL preferred starting point
+						// but messes up autoplay
+						/*
+						if (vIdx == 0) {
+							video.currentTime = 4.2;
+						}
+						*/
+
+						// -- HIDE poster img after video loads --
+						// Find the peer pagination element and add corresponding ID
+						const reworkStillEl = video.nextElementSibling.matches('img.rework-still')
+							? video.nextElementSibling
+							: video.parentElement.querySelector('.rework-still');
+
+						if (reworkStillEl) {
+							reworkStillEl.classList.add('hidden');
+						}
+
+
+						videosLoaded++;
+
+						// Check if all videos are loaded
+						if (videosLoaded === totalVideos) {
+							const loadEnd = performance.now(); // End total operation timer
+							console.log(`All videos loaded in ${(loadEnd - loadStart).toFixed(2)} ms`);
+
+							Webflow.require('ix2').init(); // reinit interactions for diagonal scroll to work
+						}
+					})
+					.catch(error => {
+						console.error(`Error loading video from ${txtFileUrl}:`, error);
+					});
+			} else {
+				console.warn("No data-src-txt attribute found for this video element.");
+				videosLoaded++;
+				if (videosLoaded === totalVideos) {
+					const loadEnd = performance.now(); // End total operation timer
+					console.log(`All videos loaded in ${(loadEnd - loadStart).toFixed(2)} ms`);
+
+					Webflow.require('ix2').init(); // reinit interactions for diagonal scroll to work
+				}
+			}
+		});
+
+
+		// set rework poster attr to still img src
+		document.querySelectorAll('.rework-still').forEach(img => {
+			const prevVideo = img.previousElementSibling;
+			if (prevVideo && prevVideo.classList.contains('rework-vid')) {
+				prevVideo.setAttribute('poster', img.getAttribute('src'));
+			}
+		});
+
+		// MY transcoding is smaller than webflows
+		document.querySelectorAll('.grid-video source').forEach(source => {
+			if (source.src) {
+				// Replace "-transcode" before the file extension with nothing
+				source.src = source.src.replace(/-transcode(\.[^.]+)$/, '$1');
+			}
+		});
+
+		// safari fix - show still img until play so no play/pause ui is visible
+		document.querySelectorAll('.grid-video').forEach(video => {
+			// Get the poster URL from the data attribute
+			const posterUrl = video.getAttribute('data-poster-url');
+
+			// Find the sibling element with class "still-blocker"
+			const stillBlocker = video.parentElement.querySelector('.still-blocker');
+
+			// If both the poster URL and still-blocker element exist, set the background image
+			if (posterUrl && stillBlocker) {
+				stillBlocker.style.backgroundImage = `url("${posterUrl}")`;
+
+
+				// Add event listener for when the video starts playing
+				// FYI this doesnt fire in safari... probably a race condition
+				/*
+				video.addEventListener('play', () => {
+				  console.log('play evt', video);
+				  stillBlocker.style.display = 'none'; // Hide the still-blocker when video plays
+				});
+				*/
+
+
+				function isVideoPlaying(videoElement) {
+					return !!(videoElement.currentTime > 0 && !videoElement.paused && !videoElement.ended);
+					//return !!(videoElement.currentTime > 0 && !videoElement.paused && !videoElement.ended && videoElement.readyState > 2);
+				}
+
+				if (isVideoPlaying(video)) {
+					console.log('vid is playing', video);
+					stillBlocker.style.display = 'none';
+				}
+
+			}
+		});
+
+	};
+</script>
+
+
+<!--  swiper -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<style id="swiper-styles">
+	:root {
+		--swiper-pagination-color: #fff;
+		--swiper-pagination-bullet-inactive-color: #fff;
+		--swiper-pagination-bullet-inactive-opacity: 0.4;
+
+		--primary-glyph-color: rgba(0, 0, 0, 0);
+		--secondary-glyph-color: rgba(0, 0, 0, 0);
+	}
+
+	/* swiper js shim */
+	.swiper-pagination-bullet:only-child {
+		visibility: hidden;
+	}
+
+	.swiper.grabbing .work-tap-area {
+		cursor: grabbing;
+	}
+</style>
+<style>
+	#bino-video>video {
+		background-size: contain;
+		background-repeat: no-repeat;
+		object-fit: contain;
+	}
+
+	.grid-video.vid-3 {
+		object-position: 50% calc(100% + 28px);
+	}
+
+	.still-blocker.w3 {
+		background-position: 50% calc(100% + 28px);
+	}
+
+	.work-title-2>.overflow {
+		width: 100% !important;
+	}
+
+	.work-title-2>.overflow>.work-card-title {
+		width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+
+	video::-webkit-media-controls {
+		display: none !important;
+		-webkit-appearance: none;
+	}
+
+	*::-webkit-media-controls-container {
+		display: none !important;
+		-webkit-appearance: none;
+	}
+
+	*::-webkit-media-controls-panel {
+		display: none !important;
+		-webkit-appearance: none;
+	}
+
+	*::-webkit-media-controls-start-playback-button {
+		display: none !important;
+		-webkit-appearance: none;
+	}
+
+	.play-reel-wrap {
+		animation: pulse-opacity 1.2s 8s infinite alternate;
+	}
+
+	@keyframes pulse-opacity {
+		0% {
+			opacity: 1;
+		}
+
+		100% {
+			opacity: 0.4;
+		}
+	}
+</style>
+
+
+<!--  swiper -->
+<script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+	window.initSwipers = () => {
+		console.log('initSwipers');
+
+		// Initialize all Swipers with unique IDs
+		document.querySelectorAll('.swiper').forEach((swiperEl, index) => {
+			// Generate unique ID
+			const uniqueId = `swiper-${index}`;
+
+			// Add unique ID to Swiper container
+			swiperEl.setAttribute('id', uniqueId);
+
+			// Find the peer pagination element and add corresponding ID
+			//const paginationEl = swiperEl.previousElementSibling.matches('.swiper-pagination') 
+			//  ? swiperEl.previousElementSibling 
+			//  : swiperEl.parentElement.querySelector('.swiper-pagination');
+			const reworkWrapEl = swiperEl.closest('.rework-wrap');
+			if (!reworkWrapEl) return;
+
+			const paginationEl = reworkWrapEl.querySelector('.swiper-pagination');
+
+			if (paginationEl) {
+				paginationEl.setAttribute('id', `pagination-${uniqueId}`);
+			}
+
+			// Initialize Swiper with unique pagination reference
+			const swiper = new Swiper(`#${uniqueId}`, {
+				effect: 'cards',
+				grabCursor: true,
+				//loop: true, // FYI - this breaks the stack order for some reason... virtual slides
+				//slidesPerView: 1,
+				pagination: {
+					el: `#pagination-${uniqueId}`,
+					horizontalClass: "nope",
+					type: 'bullets',
+					clickable: true,
+				},
+				autoplay: {
+					enabled: true, // start NOT playing (intersection obs plays it)
+					delay: 2000,
+				},
+				mousewheel: {
+					enabled: true,
+					forceToAxis: true,
+				},
+				on: {
+					slideChange: function () {
+						// Get all videos in the swiper container
+						const videos = this.el.querySelectorAll('.swiper-slide video');
+						//console.log('videos', videos);
+
+						// Loop through all videos
+						videos.forEach((video, index) => {
+							// Check if the current video is in the active slide
+							if (index === this.activeIndex) {
+								if (video.paused) {
+									video.play();
+								}
+							} else {
+								// Pause other videos
+								video.pause();
+								//video.currentTime = 0; // Reset to the beginning (optional)
+							}
+						});
+					},
+					touchStart: function () {
+						swiperEl.classList.add("grabbing");
+					},
+					sliderMove: function () {
+						swiperEl.classList.add("grabbing");
+					},
+					touchEnd: function () {
+						swiperEl.classList.remove("grabbing");
+					},
+					init: function () {
+						console.log('Swiper initialized!');
+						swiperEl.classList.add('initialized');
+					},
+				} // end ON callbacks
+			});
+
+		});
+	}
+</script>
