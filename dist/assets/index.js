@@ -2524,24 +2524,34 @@ function createRandomRotation(cube, currentIndex) {
 cubeGroup.children.forEach((cube, index) => createRandomRotation(cube, index));
 const cubeCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1e3);
 let activeCamera = camera;
+function switchCamera() {
+  console.log("switching camera");
+  if (activeCamera === camera) {
+    activeCamera = cubeCamera;
+    updateCameraQueryString("cube");
+  } else if (activeCamera === cubeCamera) {
+    activeCamera = spiralCamera;
+    updateCameraQueryString("spiral");
+  } else if (activeCamera === spiralCamera) {
+    activeCamera = orbitingCamera;
+    updateCameraQueryString("orbiting");
+  } else if (activeCamera === orbitingCamera) {
+    activeCamera = topCamera;
+    updateCameraQueryString("top");
+  } else if (activeCamera === topCamera) {
+    activeCamera = cube20Camera;
+    updateCameraQueryString("cube20");
+  } else if (activeCamera === cube20Camera) {
+    activeCamera = cube20Camera2;
+    updateCameraQueryString("cube20_2");
+  } else {
+    activeCamera = camera;
+    updateCameraQueryString("main");
+  }
+}
 window.addEventListener("keydown", (event) => {
   if (event.key === "c" || event.key === "C") {
-    console.log("switching camera");
-    if (activeCamera === camera) {
-      activeCamera = cubeCamera;
-    } else if (activeCamera === cubeCamera) {
-      activeCamera = spiralCamera;
-    } else if (activeCamera === spiralCamera) {
-      activeCamera = orbitingCamera;
-    } else if (activeCamera === orbitingCamera) {
-      activeCamera = topCamera;
-    } else if (activeCamera === topCamera) {
-      activeCamera = cube20Camera;
-    } else if (activeCamera === cube20Camera) {
-      activeCamera = cube20Camera2;
-    } else {
-      activeCamera = camera;
-    }
+    switchCamera();
   }
 });
 const bloomParams = {
@@ -2609,32 +2619,8 @@ function getInitialCamera() {
   return cameraParam && cameraMap[cameraParam] ? cameraMap[cameraParam] : camera;
 }
 activeCamera = getInitialCamera();
-window.addEventListener("keydown", (event) => {
-  if (event.key === "c" || event.key === "C") {
-    console.log("switching camera");
-    if (activeCamera === camera) {
-      activeCamera = cubeCamera;
-      updateCameraQueryString("cube");
-    } else if (activeCamera === cubeCamera) {
-      activeCamera = spiralCamera;
-      updateCameraQueryString("spiral");
-    } else if (activeCamera === spiralCamera) {
-      activeCamera = orbitingCamera;
-      updateCameraQueryString("orbiting");
-    } else if (activeCamera === orbitingCamera) {
-      activeCamera = topCamera;
-      updateCameraQueryString("top");
-    } else if (activeCamera === topCamera) {
-      activeCamera = cube20Camera;
-      updateCameraQueryString("cube20");
-    } else if (activeCamera === cube20Camera) {
-      activeCamera = cube20Camera2;
-      updateCameraQueryString("cube20_2");
-    } else {
-      activeCamera = camera;
-      updateCameraQueryString("main");
-    }
-  }
+window.addEventListener("click", () => {
+  switchCamera();
 });
 function animate() {
   requestAnimationFrame(animate);

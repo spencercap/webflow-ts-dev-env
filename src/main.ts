@@ -176,25 +176,37 @@ const cubeCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.in
 // Add after camera setup
 let activeCamera = camera as THREE.Camera;  // Start with main camera
 
+// Function to switch cameras
+function switchCamera() {
+    console.log('switching camera');
+    if (activeCamera === camera) {
+        activeCamera = cubeCamera;
+        updateCameraQueryString('cube');
+    } else if (activeCamera === cubeCamera) {
+        activeCamera = spiralCamera;
+        updateCameraQueryString('spiral');
+    } else if (activeCamera === spiralCamera) {
+        activeCamera = orbitingCamera;
+        updateCameraQueryString('orbiting');
+    } else if (activeCamera === orbitingCamera) {
+        activeCamera = topCamera;
+        updateCameraQueryString('top');
+    } else if (activeCamera === topCamera) {
+        activeCamera = cube20Camera;
+        updateCameraQueryString('cube20');
+    } else if (activeCamera === cube20Camera) {
+        activeCamera = cube20Camera2;
+        updateCameraQueryString('cube20_2');
+    } else {
+        activeCamera = camera;
+        updateCameraQueryString('main');
+    }
+}
+
 // Add keyboard control to switch cameras
 window.addEventListener('keydown', (event) => {
     if (event.key === 'c' || event.key === 'C') {
-        console.log('switching camera');
-        if (activeCamera === camera) {
-            activeCamera = cubeCamera;
-        } else if (activeCamera === cubeCamera) {
-            activeCamera = spiralCamera;
-        } else if (activeCamera === spiralCamera) {
-            activeCamera = orbitingCamera;
-        } else if (activeCamera === orbitingCamera) {
-            activeCamera = topCamera;
-        } else if (activeCamera === topCamera) {
-            activeCamera = cube20Camera;
-        } else if (activeCamera === cube20Camera) {
-            activeCamera = cube20Camera2;
-        } else {
-            activeCamera = camera;
-        }
+        switchCamera();
     }
 });
 
@@ -297,33 +309,9 @@ function getInitialCamera(): THREE.Camera {
 // Update initial camera assignment
 activeCamera = getInitialCamera();
 
-// Update camera switch event listener
-window.addEventListener('keydown', (event) => {
-    if (event.key === 'c' || event.key === 'C') {
-        console.log('switching camera');
-        if (activeCamera === camera) {
-            activeCamera = cubeCamera;
-            updateCameraQueryString('cube');
-        } else if (activeCamera === cubeCamera) {
-            activeCamera = spiralCamera;
-            updateCameraQueryString('spiral');
-        } else if (activeCamera === spiralCamera) {
-            activeCamera = orbitingCamera;
-            updateCameraQueryString('orbiting');
-        } else if (activeCamera === orbitingCamera) {
-            activeCamera = topCamera;
-            updateCameraQueryString('top');
-        } else if (activeCamera === topCamera) {
-            activeCamera = cube20Camera;
-            updateCameraQueryString('cube20');
-        } else if (activeCamera === cube20Camera) {
-            activeCamera = cube20Camera2;
-            updateCameraQueryString('cube20_2');
-        } else {
-            activeCamera = camera;
-            updateCameraQueryString('main');
-        }
-    }
+// Add click/tap listener to switch cameras
+window.addEventListener('click', () => {
+    switchCamera();
 });
 
 // Update animate function (removed ascending camera logic)
