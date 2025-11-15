@@ -23,7 +23,7 @@ export default defineConfig({
 	},
 	base: '/webflow-ts-dev-env/',
 	build: {
-		// outDir: 'dist',
+		outDir: 'docs',
 		minify: false,
 		rollupOptions: {
 			external: [
