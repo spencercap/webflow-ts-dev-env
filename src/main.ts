@@ -309,9 +309,39 @@ function getInitialCamera(): THREE.Camera {
 // Update initial camera assignment
 activeCamera = getInitialCamera();
 
-// Add click/tap listener to switch cameras
-window.addEventListener('click', () => {
+// Add double-click/tap listener to switch cameras
+// Desktop double-click
+window.addEventListener('dblclick', () => {
     switchCamera();
+});
+
+// Mobile double-tap detection
+let lastTapTime = 0;
+let tapTimeout: ReturnType<typeof setTimeout> | null = null;
+
+window.addEventListener('touchend', (event) => {
+    const currentTime = Date.now();
+    const tapLength = currentTime - lastTapTime;
+    
+    if (tapLength < 300 && tapLength > 0) {
+        // Double tap detected
+        event.preventDefault();
+        if (tapTimeout) {
+            clearTimeout(tapTimeout);
+            tapTimeout = null;
+        }
+        switchCamera();
+        lastTapTime = 0;
+    } else {
+        // Single tap - wait to see if there's a second tap
+        if (tapTimeout) {
+            clearTimeout(tapTimeout);
+        }
+        tapTimeout = setTimeout(() => {
+            lastTapTime = 0;
+        }, 300);
+        lastTapTime = currentTime;
+    }
 });
 
 // Update animate function (removed ascending camera logic)

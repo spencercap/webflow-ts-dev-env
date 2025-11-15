@@ -2619,8 +2619,31 @@ function getInitialCamera() {
   return cameraParam && cameraMap[cameraParam] ? cameraMap[cameraParam] : camera;
 }
 activeCamera = getInitialCamera();
-window.addEventListener("click", () => {
+window.addEventListener("dblclick", () => {
   switchCamera();
+});
+let lastTapTime = 0;
+let tapTimeout = null;
+window.addEventListener("touchend", (event) => {
+  const currentTime = Date.now();
+  const tapLength = currentTime - lastTapTime;
+  if (tapLength < 300 && tapLength > 0) {
+    event.preventDefault();
+    if (tapTimeout) {
+      clearTimeout(tapTimeout);
+      tapTimeout = null;
+    }
+    switchCamera();
+    lastTapTime = 0;
+  } else {
+    if (tapTimeout) {
+      clearTimeout(tapTimeout);
+    }
+    tapTimeout = setTimeout(() => {
+      lastTapTime = 0;
+    }, 300);
+    lastTapTime = currentTime;
+  }
 });
 function animate() {
   requestAnimationFrame(animate);
