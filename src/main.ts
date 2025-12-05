@@ -328,8 +328,8 @@ grainPass.uniforms.speed.value = params.grainSpeed;
 // --- GUI ---
 
 // GUI for interactive parameters
-const parentElement = document.querySelector('.bodyreal'); // Your parent element
-// console.log('parentElement', parentElement);
+const parentElement = document.querySelector('.bodyreal') || document.body; // Your parent element
+console.log('parentElement', parentElement);
 let gui: GUI | undefined;
 gui = new GUI();
 // console.log('gui', gui);
